@@ -4,7 +4,6 @@ import {
   CSSProperties,
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from "react";
 
@@ -35,14 +34,14 @@ type StartingStyle = "Editorial" | "Technical" | "Bold";
 const PRESETS: Record<StartingStyle, Theme> = {
   Editorial: {
     label: "Editorial",
-    bg: "#f5f1ea",
-    surface: "#fffdf8",
-    text: "#201c17",
-    muted: "#8a8073",
-    border: "#e4ddd1",
-    accent: "#a8552f",
-    accentText: "#fffdf8",
-    navActive: "#efe7da",
+    bg: "#f5ebee",
+    surface: "#fff8fa",
+    text: "#24191d",
+    muted: "#87747b",
+    border: "#e6d6dc",
+    accent: "#7f4054",
+    accentText: "#fff8fa",
+    navActive: "#ecdee3",
     display: "'Newsreader', serif",
     body: "'Instrument Sans', sans-serif",
     titleWeight: 500,
@@ -86,6 +85,68 @@ const PRESETS: Record<StartingStyle, Theme> = {
   },
 };
 
+function MoonIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20.6 14.5A8.4 8.4 0 0 1 9.5 3.4 8.9 8.9 0 1 0 20.6 14.5Z" />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2" />
+      <path d="M12 20v2" />
+      <path d="m4.93 4.93 1.41 1.41" />
+      <path d="m17.66 17.66 1.41 1.41" />
+      <path d="M2 12h2" />
+      <path d="M20 12h2" />
+      <path d="m6.34 17.66-1.41 1.41" />
+      <path d="m19.07 4.93-1.41 1.41" />
+    </svg>
+  );
+}
+
+const DARK_EDITORIAL: Theme = {
+  label: "Dark Editorial",
+  bg: "#171719",
+  surface: "#202023",
+  text: "#eeeeef",
+  muted: "#9b9aa0",
+  border: "#303036",
+  accent: "#b88292",
+  accentText: "#171719",
+  navActive: "#252429",
+  display: "'Newsreader', serif",
+  body: "'Instrument Sans', sans-serif",
+  titleWeight: 500,
+  radius: "14px",
+  chipRadius: "8px",
+  dark: true,
+};
+
 /* ------------------------------------------------------------------ *
  * Content (typed arrays)
  * ------------------------------------------------------------------ */
@@ -93,7 +154,7 @@ const PRESETS: Record<StartingStyle, Theme> = {
 const NAV = [
   { key: "about", label: "About" },
   { key: "work", label: "Work" },
-  { key: "articles", label: "Articles" },
+  { key: "articles", label: "Notes" },
   { key: "schedule", label: "Schedule" },
   { key: "contact", label: "Contact" },
 ] as const;
@@ -101,72 +162,80 @@ const NAV = [
 type NavKey = (typeof NAV)[number]["key"];
 
 const FOCUS = [
-  "Distributed systems",
-  "Developer tooling",
-  "API & platform design",
-  "Go · TypeScript · Postgres",
+  "Full-stack development",
+  "AI systems",
+  "Developer experience",
+  "ML & data exploration",
 ];
 
 const WORK = [
   {
-    period: "2023 — Now",
-    role: "Senior Software Engineer · Vantage",
-    desc: "Lead the backend for the data platform team. Own an ingestion pipeline processing 2B+ events a day and mentor a group of four engineers.",
+    period: "Jan 2026 - Present",
+    role: "Junior Software Engineer · oboda",
+    bullets: [
+      "Led rapid incident response and QA collaboration to resolve 60+ regression issues per month, consistently delivering under 30-minute hotfix turnaround while improving system reliability and customer satisfaction.",
+      "Built and scaled AI-driven features and analytics, reducing token usage by 35-50% through harness optimization.",
+      "Improved engineering velocity by enforcing strict linting standards, automating pre-merge performance checks for memory and time complexity, and developing workflow automation with Bash and Claude Code to reduce technical debt.",
+    ],
   },
   {
-    period: "2021 — 2023",
-    role: "Software Engineer · Northwind Labs",
-    desc: "Built the internal developer platform and CI tooling used by 200+ engineers, cutting average build times by roughly 40%.",
+    period: "Jul 2025 - Dec 2025",
+    role: "Full Stack Developer Intern · Kippap Learning Corporation",
+    bullets: [
+      "Designed and implemented an AI evaluation framework used across the Innovation Team to benchmark and validate new AI products, automating about 80% of manual testing and reducing evaluation time by 60%.",
+      "Led full-stack development of key features, including discount systems and a secure online contract signing workflow.",
+    ],
   },
   {
-    period: "2019 — 2021",
-    role: "Software Engineer · Rello",
-    desc: "Full-stack work on the payments product. Designed and shipped the company's first public API.",
+    period: "Mar 2025 - Aug 2025",
+    role: "Full Stack Developer Intern · Kapiton",
+    bullets: [
+      "Established the frontend foundation for the migration from Laravel to a modern React stack, implementing standardized architecture patterns and integrating production-grade tools like TanStack Query.",
+    ],
+  },
+  {
+    period: "Sep 2024 - Dec 2024",
+    role: "Software Engineer · Dormy PH",
+    bullets: [
+      "Designed and implemented microservices, including an analytics engine and a consistency listing checker, built with TypeScript and hosted on AWS Lambda to enable near real-time insights and reduce inconsistent listings by 90%.",
+      "Re-architected site search on an open-source stack, cutting latency by at least 50%.",
+    ],
   },
 ];
 
-const ARTICLES = [
-  {
-    title: "Designing idempotent APIs that don't lie",
-    meta: "Jun 2026 · 8 min",
-    blurb:
-      "Retries are inevitable. Here's how to make sure they never corrupt your data.",
-  },
-  {
-    title: "What I learned rewriting our ingestion pipeline in Go",
-    meta: "Apr 2026 · 12 min",
-    blurb:
-      "A candid postmortem of a six-month rewrite — what paid off and what didn't.",
-  },
-  {
-    title: "The case for boring infrastructure",
-    meta: "Feb 2026 · 6 min",
-    blurb:
-      "Why the least exciting choice is often the one that lets you sleep at night.",
-  },
-  {
-    title: "Testing distributed systems without losing your mind",
-    meta: "Nov 2025 · 10 min",
-    blurb:
-      "Deterministic simulation, fault injection, and the tests that actually catch bugs.",
-  },
-];
+type ThoughtPreview = {
+  slug: string;
+  title: string;
+  date: string;
+  description: string;
+};
 
-const SLOTS = ["9:00 AM", "10:30 AM", "1:00 PM", "2:30 PM", "4:00 PM"];
+function formatThoughtDate(date: string) {
+  if (!date) return "";
+  const parsed = new Date(`${date}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return date;
+  return parsed.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+const SLOTS = ["8:00 AM", "8:30 AM", "5:00 PM", "5:30 PM"];
 
 const CONTACTS = [
-  { label: "Email", value: "genna@hey.com", href: "mailto:genna@hey.com" },
-  {
-    label: "LinkedIn",
-    value: "/in/gennacervantes",
-    href: "https://www.linkedin.com/in/gennacervantes",
-  },
+  { label: "Email", value: "gennacervantes9@gmail.com", href: "mailto:gennacervantes9@gmail.com" },
+  { label: "Phone", value: "0921 523 6459", href: "tel:+639215236459" },
   {
     label: "GitHub",
-    value: "@gennacervantes",
-    href: "https://github.com/gennacervantes",
+    value: "github.com/genna-cervantes",
+    href: "https://github.com/genna-cervantes",
   },
-  { label: "X / Twitter", value: "@gennac", href: "https://x.com/gennac" },
+  {
+    label: "LinkedIn",
+    value: "linkedin.com/in/genna-cervantes-33b14624a",
+    href: "https://www.linkedin.com/in/genna-cervantes-33b14624a/",
+  },
 ];
 
 /* ------------------------------------------------------------------ *
@@ -283,7 +352,6 @@ function validateRestyle(raw: string, current: Theme): Restyled {
  * ------------------------------------------------------------------ */
 
 const LOG_KEY = "pf-restyle-log";
-const WIDTH_KEY = "pf-sidebar-w";
 
 type LogEntry = { label: string; ts: number; theme: Theme; fonts: string[] };
 
@@ -317,23 +385,29 @@ function styles(t: Theme) {
       alignSelf: "flex-start",
       height: "100vh",
       overflowY: "auto",
-      background: t.surface,
-      borderRight: `1px solid ${t.border}`,
+      background: t.bg,
       display: "flex",
       flexDirection: "column",
       padding: "28px 22px",
       flexShrink: 0,
     } as CSSProperties,
-    resizer: {
-      width: 7,
-      flexShrink: 0,
-      cursor: "col-resize",
-      background: "transparent",
-    } as CSSProperties,
     main: {
       flex: 1,
       minWidth: 0,
-      padding: "64px 80px",
+      padding: "0 80px 64px",
+    } as CSSProperties,
+    header: {
+      position: "sticky",
+      top: 0,
+      zIndex: 6,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      gap: 4,
+      padding: "26px 0 44px",
+      marginBottom: 14,
+      background: `linear-gradient(${t.bg} 0%, ${t.bg} 62%, ${t.bg}00 100%)`,
+      pointerEvents: "none",
     } as CSSProperties,
     brandName: {
       fontFamily: t.display,
@@ -341,6 +415,7 @@ function styles(t: Theme) {
       fontSize: 21,
       lineHeight: 1.15,
       letterSpacing: "-0.01em",
+      color: t.accent,
     } as CSSProperties,
     brandRole: {
       marginTop: 6,
@@ -350,17 +425,45 @@ function styles(t: Theme) {
       textTransform: "uppercase",
       color: t.muted,
     } as CSSProperties,
+    headerTop: {
+      display: "flex",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      gap: 18,
+      width: "100%",
+      pointerEvents: "auto",
+    } as CSSProperties,
+    modeButton: {
+      appearance: "none",
+      border: "none",
+      borderRadius: "50%",
+      background: "transparent",
+      color: t.muted,
+      cursor: "pointer",
+      fontFamily: t.body,
+      fontSize: 18,
+      fontWeight: 700,
+      width: 30,
+      height: 30,
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 18,
+      padding: 0,
+    } as CSSProperties,
     nav: {
-      marginTop: 36,
+      marginTop: "auto",
+      marginBottom: "auto",
       display: "flex",
       flexDirection: "column",
       gap: 2,
+      alignItems: "flex-end",
     } as CSSProperties,
     navItem: (active: boolean) =>
       ({
         appearance: "none",
         border: "none",
-        textAlign: "left",
+        textAlign: "right",
         cursor: "pointer",
         fontFamily: t.body,
         fontSize: 14,
@@ -442,6 +545,18 @@ function styles(t: Theme) {
       fontSize: 13,
       fontWeight: 600,
       padding: "9px 16px",
+    } as CSSProperties,
+    pazzazzDock: {
+      position: "fixed",
+      right: 24,
+      bottom: 24,
+      zIndex: 20,
+      width: 320,
+      maxWidth: "calc(100vw - 48px)",
+      boxShadow: t.dark
+        ? "0 18px 60px rgba(0, 0, 0, 0.28)"
+        : "0 18px 60px rgba(80, 45, 56, 0.16)",
+      borderRadius: t.radius,
     } as CSSProperties,
   };
   return s;
@@ -640,7 +755,6 @@ function PazzazzPanel({
  * Scheduling widget
  * ------------------------------------------------------------------ */
 
-const TODAY = new Date(2026, 6, 1); // July 1, 2026
 const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -655,21 +769,41 @@ function sameDay(a: Date, b: Date) {
   );
 }
 
+function slotToDate(date: Date, slot: string) {
+  const match = slot.match(/^(\d{1,2}):(\d{2}) (AM|PM)$/);
+  if (!match) return date;
+  let hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  const meridiem = match[3];
+  if (meridiem === "PM" && hours !== 12) hours += 12;
+  if (meridiem === "AM" && hours === 12) hours = 0;
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes);
+}
+
 function Scheduler({ t }: { t: Theme }) {
   const st = styles(t);
-  const [view, setView] = useState(new Date(TODAY.getFullYear(), TODAY.getMonth(), 1));
+  const [now, setNow] = useState(() => new Date());
+  const [view, setView] = useState(() => {
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), 1);
+  });
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [booked, setBooked] = useState(false);
+
+  useEffect(() => {
+    const tick = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(tick);
+  }, []);
 
   const year = view.getFullYear();
   const month = view.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const todayMidnight = new Date(
-    TODAY.getFullYear(),
-    TODAY.getMonth(),
-    TODAY.getDate()
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
   );
 
   const cells: (Date | null)[] = [];
@@ -678,9 +812,15 @@ function Scheduler({ t }: { t: Theme }) {
 
   const isDisabled = (date: Date) => {
     const dow = date.getDay();
-    if (dow === 0 || dow === 6) return true; // weekend
+    if (dow === 0) return true; // Sunday
     if (date < todayMidnight) return true; // past
     return false;
+  };
+
+  const isSlotDisabled = (slot: string) => {
+    if (!selectedDate) return true;
+    if (!sameDay(selectedDate, now)) return false;
+    return slotToDate(selectedDate, slot) <= now;
   };
 
   const fmtDate = (d: Date) =>
@@ -855,13 +995,15 @@ function Scheduler({ t }: { t: Theme }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {SLOTS.map((slot) => {
               const active = selectedTime === slot;
+              const disabled = isSlotDisabled(slot);
               return (
                 <button
                   key={slot}
+                  disabled={disabled}
                   onClick={() => setSelectedTime(slot)}
                   style={{
                     appearance: "none",
-                    cursor: "pointer",
+                    cursor: disabled ? "default" : "pointer",
                     textAlign: "left",
                     fontFamily: t.body,
                     fontSize: 14,
@@ -869,7 +1011,8 @@ function Scheduler({ t }: { t: Theme }) {
                     borderRadius: t.chipRadius,
                     border: `1px solid ${active ? t.accent : t.border}`,
                     background: active ? t.accent : t.surface,
-                    color: active ? t.accentText : t.text,
+                    color: active ? t.accentText : disabled ? t.muted : t.text,
+                    opacity: disabled ? 0.45 : 1,
                     fontWeight: active ? 600 : 400,
                   }}
                 >
@@ -886,11 +1029,11 @@ function Scheduler({ t }: { t: Theme }) {
 
         <button
           style={{
-            ...st.accentButton(!selectedDate || !selectedTime),
+            ...st.accentButton(!selectedDate || !selectedTime || isSlotDisabled(selectedTime)),
             width: "100%",
             marginTop: 16,
           }}
-          disabled={!selectedDate || !selectedTime}
+          disabled={!selectedDate || !selectedTime || isSlotDisabled(selectedTime)}
           onClick={() => setBooked(true)}
         >
           {selectedTime ? "Confirm booking" : "Select a time"}
@@ -906,35 +1049,60 @@ function Scheduler({ t }: { t: Theme }) {
 
 function Portfolio({
   startingStyle = "Editorial",
-  showRestyle = true,
 }: {
   startingStyle?: StartingStyle;
-  showRestyle?: boolean;
 }) {
-  const [theme, setTheme] = useState<Theme>(PRESETS[startingStyle]);
+  const baseTheme = PRESETS[startingStyle];
+  const [theme, setTheme] = useState<Theme>(baseTheme);
+  const [darkMode, setDarkMode] = useState(false);
   const [active, setActive] = useState<NavKey>("about");
-  const [sidebarW, setSidebarW] = useState(214);
-  const draggingRef = useRef(false);
+  const [thoughts, setThoughts] = useState<ThoughtPreview[]>([]);
+  const [thoughtsLoaded, setThoughtsLoaded] = useState(false);
 
   const st = styles(theme);
 
-  // Restore persisted sidebar width.
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(WIDTH_KEY);
-      if (raw) {
-        const w = parseInt(raw, 10);
-        if (!Number.isNaN(w)) setSidebarW(Math.min(340, Math.max(180, w)));
+    document.documentElement.style.background = theme.bg;
+    document.body.style.background = theme.bg;
+
+    return () => {
+      document.documentElement.style.background = "";
+      document.body.style.background = "";
+    };
+  }, [theme.bg]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadThoughts() {
+      try {
+        const res = await fetch("/api/thoughts");
+        if (!res.ok) throw new Error("Could not load thoughts.");
+        const data = (await res.json()) as ThoughtPreview[];
+        if (!cancelled) setThoughts(data);
+      } catch {
+        if (!cancelled) setThoughts([]);
+      } finally {
+        if (!cancelled) setThoughtsLoaded(true);
       }
-    } catch {
-      /* ignore */
     }
+
+    loadThoughts();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Scroll-spy: whichever section top is <= 150px becomes active.
   useEffect(() => {
     const onScroll = () => {
       let current: NavKey = NAV[0].key;
+      const atBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+      if (atBottom) {
+        setActive(NAV[NAV.length - 1].key);
+        return;
+      }
       for (const { key } of NAV) {
         const el = document.getElementById(key);
         if (el && el.getBoundingClientRect().top <= 150) current = key;
@@ -946,54 +1114,22 @@ function Portfolio({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Sidebar resize.
-  useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      if (!draggingRef.current) return;
-      const w = Math.min(340, Math.max(180, e.clientX));
-      setSidebarW(w);
-    };
-    const onUp = () => {
-      if (!draggingRef.current) return;
-      draggingRef.current = false;
-      document.body.style.userSelect = "";
-      try {
-        setSidebarW((w) => {
-          localStorage.setItem(WIDTH_KEY, String(w));
-          return w;
-        });
-      } catch {
-        /* ignore */
-      }
-    };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, []);
-
   const scrollTo = (key: NavKey) => {
     document.getElementById(key)?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const applyRestyle = useCallback((r: Restyled) => {
-    loadFonts(r.fonts);
-    setTheme(r.theme);
-  }, []);
-
-  const [resizerHover, setResizerHover] = useState(false);
+  const toggleDarkMode = () => {
+    setDarkMode((current) => {
+      const next = !current;
+      setTheme(next ? DARK_EDITORIAL : baseTheme);
+      return next;
+    });
+  };
 
   return (
     <div style={st.shell}>
       {/* Sidebar */}
-      <aside style={{ ...st.sidebar, width: sidebarW }}>
-        <div>
-          <div style={st.brandName}>Genna Cervantes</div>
-          <div style={st.brandRole}>Software Engineer</div>
-        </div>
-
+      <aside style={{ ...st.sidebar, width: 310 }}>
         <nav style={st.nav}>
           {NAV.map(({ key, label }) => (
             <button
@@ -1004,36 +1140,38 @@ function Portfolio({
               {label}
             </button>
           ))}
+          <button
+            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            style={st.modeButton}
+            onClick={toggleDarkMode}
+          >
+            {darkMode ? <SunIcon /> : <MoonIcon />}
+          </button>
         </nav>
-
-        {showRestyle && <PazzazzPanel t={theme} onApply={applyRestyle} />}
       </aside>
-
-      {/* Resizer */}
-      <div
-        style={{
-          ...st.resizer,
-          background: resizerHover ? theme.border : "transparent",
-        }}
-        onMouseEnter={() => setResizerHover(true)}
-        onMouseLeave={() => setResizerHover(false)}
-        onMouseDown={() => {
-          draggingRef.current = true;
-          document.body.style.userSelect = "none";
-        }}
-      />
 
       {/* Main */}
       <main style={st.main}>
+        <header style={st.header}>
+          <div style={st.headerTop}>
+            <div>
+              <div style={st.brandName}>Genna B. Cervantes</div>
+              <div style={st.brandRole}>Software Engineer</div>
+            </div>
+          </div>
+        </header>
+
         {/* About */}
         <section id="about" style={st.section(false)}>
           <div style={st.eyebrow}>About</div>
-          <h1 style={st.title}>I build the quiet parts of software well.</h1>
+          <h1 style={st.title}>I build full-stack systems and AI tooling.</h1>
           <p style={st.lead}>
-            I&apos;m a software engineer who gravitates toward the unglamorous
-            layer of a product — the pipelines, APIs, and tooling that everything
-            else quietly depends on. Six years in, I still believe the best
-            systems are the ones you rarely have to think about.
+            I&apos;m a Software Engineer with experience across full-stack
+            development, AI, and DevOps. I enjoy building reliable, scalable
+            systems with a strong focus on developer experience, performance,
+            and engineering efficiency. Beyond my day-to-day work, I explore
+            machine learning and data-driven technologies out of curiosity and a
+            passion for continuous learning.
           </p>
           <div style={{ ...st.grid2, marginTop: 24 }}>
             {FOCUS.map((f) => (
@@ -1050,11 +1188,16 @@ function Portfolio({
           <h2 style={st.title}>Where I&apos;ve worked</h2>
           <div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 26 }}>
             {WORK.map((job) => (
-              <div key={job.role} style={{ display: "flex", gap: 20 }}>
+              <div
+                key={job.role}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "128px minmax(0, 1fr)",
+                  columnGap: 20,
+                }}
+              >
                 <div
                   style={{
-                    width: 128,
-                    flexShrink: 0,
                     fontSize: 13,
                     color: theme.muted,
                     fontWeight: 600,
@@ -1062,19 +1205,23 @@ function Portfolio({
                 >
                   {job.period}
                 </div>
-                <div>
-                  <div style={{ fontSize: 15.5, fontWeight: 600 }}>{job.role}</div>
-                  <p
-                    style={{
-                      fontSize: 14.5,
-                      lineHeight: 1.6,
-                      color: theme.muted,
-                      margin: "6px 0 0",
-                    }}
-                  >
-                    {job.desc}
-                  </p>
-                </div>
+                <div style={{ fontSize: 15.5, fontWeight: 600 }}>{job.role}</div>
+                <ul
+                  style={{
+                    gridColumn: "1 / -1",
+                    paddingLeft: 44,
+                    fontSize: 14.5,
+                    lineHeight: 1.6,
+                    color: theme.muted,
+                    margin: "8px 0 0",
+                  }}
+                >
+                  {job.bullets.map((bullet) => (
+                    <li key={bullet} style={{ marginTop: 6 }}>
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
@@ -1083,34 +1230,56 @@ function Portfolio({
         {/* Articles */}
         <section id="articles" style={st.section(false)}>
           <div style={st.eyebrow}>Writing</div>
-          <h2 style={st.title}>Articles &amp; notes</h2>
+          <h2 style={st.title}>Thoughts and Notes</h2>
           <div style={{ marginTop: 24, display: "flex", flexDirection: "column" }}>
-            {ARTICLES.map((a, i) => (
+            {!thoughtsLoaded && (
+              <p style={{ fontSize: 14, lineHeight: 1.55, color: theme.muted, margin: 0 }}>
+                Loading thoughts...
+              </p>
+            )}
+            {thoughtsLoaded && thoughts.length === 0 && (
+              <p style={{ fontSize: 14, lineHeight: 1.55, color: theme.muted, margin: 0 }}>
+                No thoughts published yet.
+              </p>
+            )}
+            {thoughts.map((thought, i) => (
               <a
-                key={a.title}
-                href="#articles"
+                key={thought.slug}
+                href={`/thoughts/${thought.slug}`}
                 style={{
                   textDecoration: "none",
                   color: "inherit",
                   padding: "18px 0",
                   borderTop: i === 0 ? "none" : `1px solid ${theme.border}`,
-                  display: "block",
+                  display: "grid",
+                  gridTemplateColumns: "90px minmax(0, 1fr)",
+                  columnGap: 8,
                 }}
               >
-                <div style={{ fontSize: 12, color: theme.muted }}>{a.meta}</div>
+                <div style={{ fontSize: 13, color: theme.muted, fontWeight: 600 }}>
+                  {formatThoughtDate(thought.date)}
+                </div>
                 <div
                   style={{
                     fontFamily: theme.display,
                     fontWeight: theme.titleWeight,
                     fontSize: 19,
-                    margin: "6px 0 6px",
                     lineHeight: 1.2,
                   }}
                 >
-                  {a.title}
+                  {thought.title}
                 </div>
-                <div style={{ fontSize: 14, lineHeight: 1.55, color: theme.muted }}>
-                  {a.blurb}
+                <div
+                  style={{
+                    gridColumn: "1 / -1",
+                    paddingLeft: 44,
+                    fontSize: 14,
+                    lineHeight: 1.55,
+                    color: theme.muted,
+                    marginTop: 8,
+                  }}
+                >
+                  {thought.description}
                 </div>
               </a>
             ))}
@@ -1130,10 +1299,9 @@ function Portfolio({
         {/* Contact */}
         <section id="contact" style={st.section(true)}>
           <div style={st.eyebrow}>Contact</div>
-          <h2 style={st.title}>Let&apos;s talk</h2>
+          <h2 style={st.title}>Get in touch</h2>
           <p style={st.lead}>
-            Whether it&apos;s a role, a collaboration, or just to compare notes —
-            I read everything that lands in my inbox.
+            Reach me through email, phone, or GitHub.
           </p>
           <div style={{ ...st.grid2, marginTop: 24 }}>
             {CONTACTS.map((c) => (
@@ -1153,13 +1321,13 @@ function Portfolio({
           </div>
         </section>
       </main>
+
     </div>
   );
 }
 
 /* The App Router page entry. Configure the portfolio here — `startingStyle`
-   is one of "Editorial" | "Technical" | "Bold", and `showRestyle` toggles the
-   Pazzazz panel. */
+   is one of "Editorial" | "Technical" | "Bold". */
 export default function Page() {
-  return <Portfolio startingStyle="Editorial" showRestyle />;
+  return <Portfolio startingStyle="Editorial" />;
 }

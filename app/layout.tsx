@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Genna Cervantes — Software Engineer",
   description:
-    "Personal portfolio of Genna Cervantes, a software engineer who builds the quiet parts of software well.",
+    "Portfolio of Genna B. Cervantes, a software engineer focused on full-stack systems, AI tooling, and developer workflow automation.",
 };
 
 export default function RootLayout({
