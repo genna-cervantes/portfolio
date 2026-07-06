@@ -26,6 +26,7 @@ function isActiveBooking(booking: Booking, now = new Date()) {
 async function readBookings(): Promise<Booking[]> {
   try {
     const raw = await fs.readFile(BOOKINGS_FILE, "utf8");
+    if (!raw.trim()) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
@@ -48,8 +49,23 @@ async function writeBookings(bookings: Booking[]) {
 }
 
 export async function GET() {
-  const bookings = await readBookings();
-  return Response.json({ bookings: bookings.filter((booking) => isActiveBooking(booking)) });
+  try {
+    const now = new Date();
+    const bookings = await readBookings();
+    const activeBookings = bookings.filter((booking) => isActiveBooking(booking, now));
+
+    if (activeBookings.length !== bookings.length) {
+      await writeBookings(activeBookings);
+    }
+
+    return Response.json({ bookings: activeBookings });
+  } catch (error) {
+    console.error("Could not read bookings.", error);
+    return Response.json(
+      { error: "Could not load bookings right now." },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: Request) {
@@ -69,25 +85,34 @@ export async function POST(req: Request) {
 
   const normalizedStart = parsed.toISOString();
   const now = new Date();
-  const bookings = await readBookings();
-  const activeBookings = bookings.filter((booking) => isActiveBooking(booking, now));
-  const exists = activeBookings.some((booking) => booking.start === normalizedStart);
-
-  if (exists) {
-    return Response.json(
-      { error: "That slot was already booked. Please pick another time." },
-      { status: 409 }
-    );
-  }
-
-  activeBookings.push({
+  const pendingBooking = {
     start: normalizedStart,
     createdAt: now.toISOString(),
-    status: "pending",
+    status: "pending" as const,
     expiresAt: new Date(now.getTime() + PENDING_TTL_MS).toISOString(),
-  });
+  };
 
-  await writeBookings(activeBookings);
+  try {
+    const bookings = await readBookings();
+    const activeBookings = bookings.filter((booking) => isActiveBooking(booking, now));
+    const exists = activeBookings.some((booking) => booking.start === normalizedStart);
 
-  return Response.json({ ok: true });
+    if (exists) {
+      return Response.json(
+        { error: "That slot was already booked. Please pick another time." },
+        { status: 409 }
+      );
+    }
+
+    activeBookings.push(pendingBooking);
+    await writeBookings(activeBookings);
+
+    return Response.json({ ok: true, booking: pendingBooking }, { status: 201 });
+  } catch (error) {
+    console.error("Could not reserve booking.", error);
+    return Response.json(
+      { error: "Could not reserve that slot right now." },
+      { status: 500 }
+    );
+  }
 }

@@ -814,6 +814,17 @@ function googleCalendarLink(start: Date) {
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
+async function readJsonResponse(res: Response) {
+  const text = await res.text();
+  if (!text) return null;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
 function Scheduler({ t }: { t: Theme }) {
   const st = styles(t);
   const [isCompact, setIsCompact] = useState(false);
@@ -847,7 +858,7 @@ function Scheduler({ t }: { t: Theme }) {
       try {
         const res = await fetch("/api/bookings");
         if (!res.ok) return;
-        const data = await res.json();
+        const data = await readJsonResponse(res);
         const starts = Array.isArray(data?.bookings)
           ? data.bookings
               .map((booking: { start?: unknown }) =>
@@ -927,7 +938,7 @@ function Scheduler({ t }: { t: Theme }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ start: start.toISOString() }),
       });
-      const data = await res.json();
+      const data = await readJsonResponse(res);
 
       if (!res.ok) {
         throw new Error(data?.error || "Could not reserve that slot.");
