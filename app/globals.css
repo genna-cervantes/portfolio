@@ -93,6 +93,35 @@ button:focus {
   color: #7f4054;
 }
 
+.notes-theme-toggle {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 1px solid #e6d6dc;
+  border-radius: 8px;
+  color: #7f4054;
+  cursor: pointer;
+  display: inline-flex;
+  height: 36px;
+  justify-content: center;
+  margin-bottom: 16px;
+  width: 36px;
+}
+
+.notes-theme-toggle:hover {
+  background: #ecdee3;
+}
+
+.notes-theme-toggle svg {
+  fill: none;
+  height: 17px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 17px;
+}
+
 .notes-nav a.is-active {
   background: #ecdee3;
   color: #7f4054;
@@ -279,6 +308,15 @@ html[data-theme="dark"] .notes-nav a.is-active {
   background: #33242b;
 }
 
+html[data-theme="dark"] .notes-theme-toggle {
+  border-color: #3a343a;
+  color: #f0a8bd;
+}
+
+html[data-theme="dark"] .notes-theme-toggle:hover {
+  background: #33242b;
+}
+
 html[data-theme="dark"] .notes-content p,
 html[data-theme="dark"] .notes-content li {
   color: #c7bcc2;
@@ -351,6 +389,11 @@ html[data-theme="dark"] .notes-content .hljs-comment {
 
   .notes-nav .notes-nav-nested {
     padding-right: 12px;
+  }
+
+  .notes-theme-toggle {
+    flex: 0 0 auto;
+    margin-bottom: 0;
   }
 
   .notes-page {
