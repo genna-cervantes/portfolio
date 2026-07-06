@@ -5,13 +5,13 @@ import { useEffect, useState } from "react";
 import type { NoteHeading } from "@/lib/notes";
 
 export default function ArticleNav({ headings }: { headings: NoteHeading[] }) {
-  const [active, setActive] = useState("top");
+  const [active, setActive] = useState("");
 
   useEffect(() => {
-    const ids = ["top", ...headings.map((heading) => heading.id)];
+    const ids = headings.map((heading) => heading.id);
 
     const onScroll = () => {
-      let current = "top";
+      let current = "";
 
       for (const id of ids) {
         const el = document.getElementById(id);
@@ -31,9 +31,6 @@ export default function ArticleNav({ headings }: { headings: NoteHeading[] }) {
       <Link className="notes-back-link" href="/#articles">
         ← All notes
       </Link>
-      <a className={active === "top" ? "is-active" : ""} href="#top">
-        Overview
-      </a>
       {headings.map((heading) => (
         <a
           key={heading.id}

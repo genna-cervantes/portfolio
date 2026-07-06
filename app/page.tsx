@@ -175,9 +175,9 @@ const WORK = [
     period: "Jan 2026 - Present",
     role: "Junior Software Engineer · oboda",
     bullets: [
-      "Led rapid incident response and QA collaboration to resolve 60+ regression issues per month, consistently delivering under 30-minute hotfix turnaround while improving system reliability and customer satisfaction.",
-      "Built and scaled AI-driven features and analytics, reducing token usage by 35-50% through harness optimization.",
-      "Improved engineering velocity by enforcing strict linting standards, automating pre-merge performance checks for memory and time complexity, and developing workflow automation with Bash and Claude Code to reduce technical debt.",
+      "Delivered AI and core product features, including offline capabilities, codebase improvements, and production hotfixes. Served in the on-call rotation, consistently attending to critical production issues in under 60 minutes while maintaining product reliability.",
+      "Improved engineering efficiency by strengthening code review standards, auditing and optimizing GitHub Actions workflows, and streamlining developer processes, reducing CI execution time by 50% and helping accelerate delivery across the team.",
+      "Owned the release process and automated deployments, reducing release time by 80%, eliminating repetitive manual steps, and increasing deployment reliability across engineering teams.",
     ],
   },
   {
@@ -185,7 +185,6 @@ const WORK = [
     role: "Post Trade Engineer Intern · Macquarie Group",
     bullets: [
       "Automated service status monitoring by building a notification script in Python, eliminating manual checks and improving response time; later scaled for use across multiple core application modules.",
-      "Enhanced internal UI components to improve usability and clarity, contributing to smoother workflows for end users.",
       "Implemented cron-based background jobs in Java applications to support automated notifications and scheduled processes.",
     ],
   },
@@ -236,16 +235,10 @@ const SLOTS = ["8:00 AM", "8:30 AM", "5:00 PM", "5:30 PM"];
 
 const CONTACTS = [
   { label: "Email", value: "gennacervantes9@gmail.com", href: "mailto:gennacervantes9@gmail.com" },
-  { label: "Phone", value: "0921 523 6459", href: "tel:+639215236459" },
   {
     label: "GitHub",
     value: "github.com/genna-cervantes",
     href: "https://github.com/genna-cervantes",
-  },
-  {
-    label: "LinkedIn",
-    value: "linkedin.com/in/genna-cervantes-33b14624a",
-    href: "https://www.linkedin.com/in/genna-cervantes-33b14624a/",
   },
 ];
 
@@ -794,6 +787,33 @@ function slotToDate(date: Date, slot: string) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes);
 }
 
+function googleCalendarTimestamp(date: Date) {
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate()),
+    "T",
+    pad(date.getHours()),
+    pad(date.getMinutes()),
+    "00",
+  ].join("");
+}
+
+function googleCalendarLink(start: Date) {
+  const end = new Date(start.getTime() + 30 * 60 * 1000);
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: "Intro call with Genna Cervantes",
+    dates: `${googleCalendarTimestamp(start)}/${googleCalendarTimestamp(end)}`,
+    details: "30-minute intro call",
+    location: "Google Meet",
+    add: "gennacervantes9@gmail.com",
+  });
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 function Scheduler({ t }: { t: Theme }) {
   const st = styles(t);
   const [isCompact, setIsCompact] = useState(false);
@@ -804,7 +824,9 @@ function Scheduler({ t }: { t: Theme }) {
   });
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [booked, setBooked] = useState(false);
+  const [bookingBusy, setBookingBusy] = useState(false);
+  const [bookingMessage, setBookingMessage] = useState("");
+  const [unavailableStarts, setUnavailableStarts] = useState<string[]>([]);
 
   useEffect(() => {
     const tick = window.setInterval(() => setNow(new Date()), 60_000);
@@ -816,6 +838,34 @@ function Scheduler({ t }: { t: Theme }) {
     sync();
     window.addEventListener("resize", sync);
     return () => window.removeEventListener("resize", sync);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadBookings() {
+      try {
+        const res = await fetch("/api/bookings");
+        if (!res.ok) return;
+        const data = await res.json();
+        const starts = Array.isArray(data?.bookings)
+          ? data.bookings
+              .map((booking: { start?: unknown }) =>
+                typeof booking.start === "string" ? booking.start : ""
+              )
+              .filter(Boolean)
+          : [];
+
+        if (!cancelled) setUnavailableStarts(starts);
+      } catch {
+        /* ignore */
+      }
+    }
+
+    loadBookings();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const year = view.getFullYear();
@@ -845,61 +895,57 @@ function Scheduler({ t }: { t: Theme }) {
     return slotToDate(selectedDate, slot) <= now;
   };
 
+  const isSlotBooked = (slot: string) => {
+    if (!selectedDate) return false;
+    return unavailableStarts.includes(slotToDate(selectedDate, slot).toISOString());
+  };
+
   const fmtDate = (d: Date) =>
     d.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
       day: "numeric",
-    });
+  });
 
-  const reset = () => {
-    setBooked(false);
-    setSelectedDate(null);
-    setSelectedTime(null);
+  const openCalendarLink = async () => {
+    if (
+      !selectedDate ||
+      !selectedTime ||
+      isSlotDisabled(selectedTime) ||
+      isSlotBooked(selectedTime)
+    ) {
+      return;
+    }
+
+    const start = slotToDate(selectedDate, selectedTime);
+    setBookingBusy(true);
+    setBookingMessage("");
+
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ start: start.toISOString() }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Could not reserve that slot.");
+      }
+
+      window.open(googleCalendarLink(start), "_blank", "noopener,noreferrer");
+      setBookingMessage("Slot reserved. Finish saving it in Google Calendar.");
+      setUnavailableStarts((current) =>
+        current.includes(start.toISOString()) ? current : [...current, start.toISOString()]
+      );
+    } catch (error) {
+      setBookingMessage(
+        error instanceof Error ? error.message : "Could not reserve that slot."
+      );
+    } finally {
+      setBookingBusy(false);
+    }
   };
-
-  if (booked && selectedDate && selectedTime) {
-    return (
-      <div style={{ ...st.card, textAlign: "center", padding: 40 }}>
-        <div
-          style={{
-            width: 46,
-            height: 46,
-            borderRadius: "50%",
-            background: t.accent,
-            color: t.accentText,
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 22,
-            fontWeight: 700,
-            margin: "0 auto",
-          }}
-        >
-          ✓
-        </div>
-        <h3
-          style={{
-            fontFamily: t.display,
-            fontWeight: t.titleWeight,
-            fontSize: 22,
-            margin: "16px 0 6px",
-          }}
-        >
-          You&apos;re booked in
-        </h3>
-        <p style={{ fontSize: 15, margin: 0 }}>
-          {fmtDate(selectedDate)} at {selectedTime}
-        </p>
-        <p style={{ fontSize: 13.5, color: t.muted, margin: "10px 0 20px" }}>
-          A calendar invite is on its way to your inbox.
-        </p>
-        <button style={st.ghostButton} onClick={reset}>
-          Book another time
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div
@@ -974,6 +1020,7 @@ function Scheduler({ t }: { t: Theme }) {
                 onClick={() => {
                   setSelectedDate(date);
                   setSelectedTime(null);
+                  setBookingMessage("");
                 }}
                 style={{
                   appearance: "none",
@@ -1017,12 +1064,16 @@ function Scheduler({ t }: { t: Theme }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {SLOTS.map((slot) => {
               const active = selectedTime === slot;
-              const disabled = isSlotDisabled(slot);
+              const booked = isSlotBooked(slot);
+              const disabled = isSlotDisabled(slot) || booked;
               return (
                 <button
                   key={slot}
                   disabled={disabled}
-                  onClick={() => setSelectedTime(slot)}
+                  onClick={() => {
+                    setSelectedTime(slot);
+                    setBookingMessage("");
+                  }}
                   style={{
                     appearance: "none",
                     cursor: disabled ? "default" : "pointer",
@@ -1034,11 +1085,11 @@ function Scheduler({ t }: { t: Theme }) {
                     border: `1px solid ${active ? t.accent : t.border}`,
                     background: active ? t.accent : t.surface,
                     color: active ? t.accentText : disabled ? t.muted : t.text,
-                    opacity: disabled ? 0.45 : 1,
+                    opacity: disabled ? 0.38 : 1,
                     fontWeight: active ? 600 : 400,
                   }}
                 >
-                  {slot}
+                  {booked ? `${slot} · booked` : slot}
                 </button>
               );
             })}
@@ -1051,15 +1102,36 @@ function Scheduler({ t }: { t: Theme }) {
 
         <button
           style={{
-            ...st.accentButton(!selectedDate || !selectedTime || isSlotDisabled(selectedTime)),
+            ...st.accentButton(
+              bookingBusy ||
+                !selectedDate ||
+                !selectedTime ||
+                isSlotDisabled(selectedTime) ||
+                isSlotBooked(selectedTime)
+            ),
             width: "100%",
             marginTop: 16,
           }}
-          disabled={!selectedDate || !selectedTime || isSlotDisabled(selectedTime)}
-          onClick={() => setBooked(true)}
+          disabled={
+            bookingBusy ||
+            !selectedDate ||
+            !selectedTime ||
+            isSlotDisabled(selectedTime) ||
+            isSlotBooked(selectedTime)
+          }
+          onClick={openCalendarLink}
         >
-          {selectedTime ? "Confirm booking" : "Select a time"}
+          {bookingBusy
+            ? "Reserving..."
+            : selectedTime
+              ? "Add to Google Calendar"
+              : "Select a time"}
         </button>
+        {bookingMessage && (
+          <p style={{ fontSize: 12, lineHeight: 1.5, color: t.muted, margin: "10px 0 0" }}>
+            {bookingMessage}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -1240,15 +1312,10 @@ function Portfolio({
         <section id="about" style={st.section(false)}>
           <div style={st.eyebrow}>About</div>
           <h1 style={{ ...st.title, fontSize: isCompact ? 28 : st.title.fontSize }}>
-            I build full-stack systems and AI tooling.
+            Building What&apos;s Next
           </h1>
           <p style={st.lead}>
-            I&apos;m a Software Engineer with experience across full-stack
-            development, AI, and DevOps. I enjoy building reliable, scalable
-            systems with a strong focus on developer experience, performance,
-            and engineering efficiency. Beyond my day-to-day work, I explore
-            machine learning and data-driven technologies out of curiosity and a
-            passion for continuous learning.
+            I enjoy turning ideas into software, from full-stack applications to AI-powered tools and the infrastructure behind them. I care about building reliable, scalable systems with a focus on dev ex, performance, and engineering efficiency. Outside of work, I enjoy exploring data and machine learning, driven by curiosity and a constant desire to build better software.
           </p>
           <div
             style={{
@@ -1400,7 +1467,7 @@ function Portfolio({
           <h2 style={{ ...st.title, fontSize: isCompact ? 27 : st.title.fontSize }}>
             Book a 30-min intro call
           </h2>
-          <p style={st.lead}>Grab a slot below — 30 minutes, no agenda required.</p>
+          <p style={st.lead}>Grab a slot below, no agenda required :)</p>
           <div style={{ marginTop: 24 }}>
             <Scheduler t={theme} />
           </div>
@@ -1413,7 +1480,7 @@ function Portfolio({
             Get in touch
           </h2>
           <p style={st.lead}>
-            Reach me through email, phone, or GitHub.
+            Reach me through email or GitHub.
           </p>
           <div
             style={{

@@ -165,13 +165,13 @@ button:focus {
 
 .notes-content h2 {
   font-size: 28px;
-  margin: 36px 0 14px;
+  margin: 56px 0 18px;
   scroll-margin-top: 28px;
 }
 
 .notes-content h3 {
   font-size: 22px;
-  margin: 28px 0 12px;
+  margin: 42px 0 16px;
   scroll-margin-top: 28px;
 }
 
@@ -183,11 +183,11 @@ button:focus {
 }
 
 .notes-content p {
-  margin: 0 0 18px;
+  margin: 0 0 20px;
 }
 
 .notes-content ul {
-  margin: 0 0 22px;
+  margin: 0 0 26px;
   padding-left: 24px;
 }
 
@@ -197,6 +197,48 @@ button:focus {
   color: #7f4054;
   font-size: 0.92em;
   padding: 2px 5px;
+}
+
+.notes-content pre {
+  background: #fff8fa;
+  border: 1px solid #e6d6dc;
+  border-radius: 8px;
+  color: #24191d;
+  line-height: 1.65;
+  margin: 18px 0 24px;
+  overflow-x: auto;
+  padding: 16px;
+}
+
+.notes-content pre code {
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  padding: 0;
+}
+
+.notes-content .hljs-keyword,
+.notes-content .hljs-selector-tag,
+.notes-content .hljs-built_in {
+  color: #8f3150;
+}
+
+.notes-content .hljs-title,
+.notes-content .hljs-title.function_,
+.notes-content .hljs-property,
+.notes-content .hljs-attr {
+  color: #2f6f5e;
+}
+
+.notes-content .hljs-string,
+.notes-content .hljs-number,
+.notes-content .hljs-literal {
+  color: #8a5a13;
+}
+
+.notes-content .hljs-comment {
+  color: #8f7f86;
+  font-style: italic;
 }
 
 html[data-theme="dark"] .notes-shell,
@@ -214,10 +256,13 @@ html[data-theme="dark"] .notes-nav .notes-back-link,
 html[data-theme="dark"] .notes-nav .notes-back-link:hover,
 html[data-theme="dark"] .notes-nav a.is-active,
 html[data-theme="dark"] .notes-nav .notes-nav-nested.is-active,
-html[data-theme="dark"] .notes-content h1,
+html[data-theme="dark"] .notes-content h1 {
+  color: #f0a8bd;
+}
+
 html[data-theme="dark"] .notes-content h2,
 html[data-theme="dark"] .notes-content h3 {
-  color: #f0a8bd;
+  color: #f7f3f5;
 }
 
 html[data-theme="dark"] .notes-date,
@@ -242,6 +287,40 @@ html[data-theme="dark"] .notes-content li {
 html[data-theme="dark"] .notes-content code {
   background: #33242b;
   color: #f0a8bd;
+}
+
+html[data-theme="dark"] .notes-content pre {
+  background: #1d1d22;
+  border-color: #3a343a;
+  color: #f7f3f5;
+}
+
+html[data-theme="dark"] .notes-content pre code {
+  background: transparent;
+  color: inherit;
+}
+
+html[data-theme="dark"] .notes-content .hljs-keyword,
+html[data-theme="dark"] .notes-content .hljs-selector-tag,
+html[data-theme="dark"] .notes-content .hljs-built_in {
+  color: #f0a8bd;
+}
+
+html[data-theme="dark"] .notes-content .hljs-title,
+html[data-theme="dark"] .notes-content .hljs-title.function_,
+html[data-theme="dark"] .notes-content .hljs-property,
+html[data-theme="dark"] .notes-content .hljs-attr {
+  color: #8fd6c6;
+}
+
+html[data-theme="dark"] .notes-content .hljs-string,
+html[data-theme="dark"] .notes-content .hljs-number,
+html[data-theme="dark"] .notes-content .hljs-literal {
+  color: #e6c46d;
+}
+
+html[data-theme="dark"] .notes-content .hljs-comment {
+  color: #8f8d85;
 }
 
 @media (max-width: 760px) {
