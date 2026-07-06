@@ -1,4 +1,5 @@
 import { promises as fs } from "fs";
+import os from "os";
 import path from "path";
 
 export const runtime = "nodejs";
@@ -10,7 +11,10 @@ type Booking = {
   expiresAt?: string;
 };
 
-const BOOKINGS_FILE = path.join(process.cwd(), "data", "bookings.json");
+const BOOKINGS_FILE =
+  process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
+    ? path.join(os.tmpdir(), "bookings.json")
+    : path.join(process.cwd(), "data", "bookings.json");
 const PENDING_TTL_MS = 15 * 60 * 1000;
 
 function isActiveBooking(booking: Booking, now = new Date()) {
