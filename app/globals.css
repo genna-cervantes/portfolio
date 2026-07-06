@@ -97,29 +97,16 @@ button:focus {
   align-items: center;
   appearance: none;
   background: transparent;
-  border: 1px solid #e6d6dc;
-  border-radius: 8px;
-  color: #7f4054;
+  border: none;
+  border-radius: 50%;
+  color: #87747b;
   cursor: pointer;
   display: inline-flex;
-  height: 36px;
+  height: 30px;
   justify-content: center;
-  margin-bottom: 16px;
-  width: 36px;
-}
-
-.notes-theme-toggle:hover {
-  background: #ecdee3;
-}
-
-.notes-theme-toggle svg {
-  fill: none;
-  height: 17px;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2;
-  width: 17px;
+  margin-top: 18px;
+  padding: 0;
+  width: 30px;
 }
 
 .notes-nav a.is-active {
@@ -309,12 +296,7 @@ html[data-theme="dark"] .notes-nav a.is-active {
 }
 
 html[data-theme="dark"] .notes-theme-toggle {
-  border-color: #3a343a;
-  color: #f0a8bd;
-}
-
-html[data-theme="dark"] .notes-theme-toggle:hover {
-  background: #33242b;
+  color: #c7bcc2;
 }
 
 html[data-theme="dark"] .notes-content p,
@@ -393,7 +375,7 @@ html[data-theme="dark"] .notes-content .hljs-comment {
 
   .notes-theme-toggle {
     flex: 0 0 auto;
-    margin-bottom: 0;
+    margin-top: 0;
   }
 
   .notes-page {
