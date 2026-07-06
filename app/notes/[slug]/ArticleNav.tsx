@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { ThoughtHeading } from "@/lib/thoughts";
+import type { NoteHeading } from "@/lib/notes";
 
-export default function ArticleNav({ headings }: { headings: ThoughtHeading[] }) {
+export default function ArticleNav({ headings }: { headings: NoteHeading[] }) {
   const [active, setActive] = useState("top");
 
   useEffect(() => {
@@ -27,9 +27,9 @@ export default function ArticleNav({ headings }: { headings: ThoughtHeading[] })
   }, [headings]);
 
   return (
-    <nav className="thought-nav" aria-label="Article sections">
-      <Link className="thought-back-link" href="/#articles">
-        ← All thoughts
+    <nav className="notes-nav" aria-label="Article sections">
+      <Link className="notes-back-link" href="/#articles">
+        ← All notes
       </Link>
       <a className={active === "top" ? "is-active" : ""} href="#top">
         Overview
@@ -38,7 +38,7 @@ export default function ArticleNav({ headings }: { headings: ThoughtHeading[] })
         <a
           key={heading.id}
           className={[
-            heading.level === 3 ? "thought-nav-nested" : "",
+            heading.level === 3 ? "notes-nav-nested" : "",
             active === heading.id ? "is-active" : "",
           ]
             .filter(Boolean)

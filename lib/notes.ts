@@ -1,25 +1,25 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-export type ThoughtMeta = {
+export type NoteMeta = {
   slug: string;
   title: string;
   date: string;
   description: string;
 };
 
-export type ThoughtHeading = {
+export type NoteHeading = {
   id: string;
   level: 2 | 3;
   text: string;
 };
 
-export type Thought = ThoughtMeta & {
+export type Note = NoteMeta & {
   html: string;
-  headings: ThoughtHeading[];
+  headings: NoteHeading[];
 };
 
-const THOUGHTS_DIR = path.join(process.cwd(), "content", "thoughts");
+const NOTES_DIR = path.join(process.cwd(), "content", "notes");
 
 function parseFrontmatter(raw: string) {
   const match = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
@@ -63,7 +63,7 @@ function slugify(value: string) {
 function markdownToHtml(markdown: string) {
   const lines = markdown.split("\n");
   const html: string[] = [];
-  const headings: ThoughtHeading[] = [];
+  const headings: NoteHeading[] = [];
   let listOpen = false;
 
   const closeList = () => {
@@ -81,8 +81,6 @@ function markdownToHtml(markdown: string) {
 
     if (trimmed.startsWith("# ")) {
       closeList();
-      const text = trimmed.slice(2);
-      html.push(`<h1>${renderInline(text)}</h1>`);
       continue;
     }
 
@@ -121,15 +119,15 @@ function markdownToHtml(markdown: string) {
   return { html: html.join("\n"), headings };
 }
 
-export async function getThoughtSlugs() {
-  const files = await fs.readdir(THOUGHTS_DIR);
+export async function getNoteSlugs() {
+  const files = await fs.readdir(NOTES_DIR);
   return files
     .filter((file) => file.endsWith(".md"))
     .map((file) => file.replace(/\.md$/, ""));
 }
 
-export async function getThought(slug: string): Promise<Thought> {
-  const filePath = path.join(THOUGHTS_DIR, `${slug}.md`);
+export async function getNote(slug: string): Promise<Note> {
+  const filePath = path.join(NOTES_DIR, `${slug}.md`);
   const raw = await fs.readFile(filePath, "utf8");
   const { meta, body } = parseFrontmatter(raw);
   const rendered = markdownToHtml(body);
@@ -144,11 +142,11 @@ export async function getThought(slug: string): Promise<Thought> {
   };
 }
 
-export async function getThoughts(): Promise<ThoughtMeta[]> {
-  const slugs = await getThoughtSlugs();
-  const thoughts = await Promise.all(slugs.map((slug) => getThought(slug)));
+export async function getNotes(): Promise<NoteMeta[]> {
+  const slugs = await getNoteSlugs();
+  const notes = await Promise.all(slugs.map((slug) => getNote(slug)));
 
-  return thoughts
+  return notes
     .map(({ slug, title, date, description }) => ({
       slug,
       title,

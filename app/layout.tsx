@@ -7,6 +7,14 @@ export const metadata: Metadata = {
     "Portfolio of Genna B. Cervantes, a software engineer focused on full-stack systems, AI tooling, and developer workflow automation.",
 };
 
+const themeScript = `
+try {
+  if (localStorage.getItem("portfolio-theme") === "dark") {
+    document.documentElement.dataset.theme = "dark";
+  }
+} catch {}
+`;
+
 export default function RootLayout({
   children,
 }: {
@@ -15,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

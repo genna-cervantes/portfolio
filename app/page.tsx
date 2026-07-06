@@ -31,6 +31,8 @@ type Theme = {
 
 type StartingStyle = "Editorial" | "Technical" | "Bold";
 
+const THEME_STORAGE_KEY = "portfolio-theme";
+
 const PRESETS: Record<StartingStyle, Theme> = {
   Editorial: {
     label: "Editorial",
@@ -131,14 +133,14 @@ function SunIcon() {
 
 const DARK_EDITORIAL: Theme = {
   label: "Dark Editorial",
-  bg: "#171719",
-  surface: "#202023",
-  text: "#eeeeef",
-  muted: "#9b9aa0",
-  border: "#303036",
-  accent: "#b88292",
-  accentText: "#171719",
-  navActive: "#252429",
+  bg: "#111114",
+  surface: "#1d1d22",
+  text: "#f7f3f5",
+  muted: "#c7bcc2",
+  border: "#3a343a",
+  accent: "#f0a8bd",
+  accentText: "#171014",
+  navActive: "#33242b",
   display: "'Newsreader', serif",
   body: "'Instrument Sans', sans-serif",
   titleWeight: 500,
@@ -179,6 +181,15 @@ const WORK = [
     ],
   },
   {
+    period: "Jan 2026 - Apr 2026",
+    role: "Post Trade Engineer Intern · Macquarie Group",
+    bullets: [
+      "Automated service status monitoring by building a notification script in Python, eliminating manual checks and improving response time; later scaled for use across multiple core application modules.",
+      "Enhanced internal UI components to improve usability and clarity, contributing to smoother workflows for end users.",
+      "Implemented cron-based background jobs in Java applications to support automated notifications and scheduled processes.",
+    ],
+  },
+  {
     period: "Jul 2025 - Dec 2025",
     role: "Full Stack Developer Intern · Kippap Learning Corporation",
     bullets: [
@@ -203,14 +214,14 @@ const WORK = [
   },
 ];
 
-type ThoughtPreview = {
+type NotePreview = {
   slug: string;
   title: string;
   date: string;
   description: string;
 };
 
-function formatThoughtDate(date: string) {
+function formatNoteDate(date: string) {
   if (!date) return "";
   const parsed = new Date(`${date}T00:00:00`);
   if (Number.isNaN(parsed.getTime())) return date;
@@ -377,6 +388,7 @@ function styles(t: Theme) {
       minHeight: "100vh",
       background: t.bg,
       color: t.text,
+      colorScheme: t.dark ? "dark" : "light",
       fontFamily: t.body,
     } as CSSProperties,
     sidebar: {
@@ -497,10 +509,10 @@ function styles(t: Theme) {
     } as CSSProperties,
     lead: {
       fontFamily: t.body,
+      color: t.dark ? t.muted : t.text,
       fontSize: 16,
       lineHeight: 1.65,
       maxWidth: 560,
-      opacity: 0.85,
       marginTop: 16,
     } as CSSProperties,
     card: {
@@ -508,6 +520,7 @@ function styles(t: Theme) {
       border: `1px solid ${t.border}`,
       borderRadius: t.radius,
       padding: 20,
+      overflowWrap: "anywhere",
     } as CSSProperties,
     chip: {
       background: t.surface,
@@ -515,6 +528,7 @@ function styles(t: Theme) {
       borderRadius: t.chipRadius,
       padding: "14px 16px",
       fontSize: 14,
+      overflowWrap: "anywhere",
     } as CSSProperties,
     grid2: {
       display: "grid",
@@ -782,6 +796,7 @@ function slotToDate(date: Date, slot: string) {
 
 function Scheduler({ t }: { t: Theme }) {
   const st = styles(t);
+  const [isCompact, setIsCompact] = useState(false);
   const [now, setNow] = useState(() => new Date());
   const [view, setView] = useState(() => {
     const today = new Date();
@@ -794,6 +809,13 @@ function Scheduler({ t }: { t: Theme }) {
   useEffect(() => {
     const tick = window.setInterval(() => setNow(new Date()), 60_000);
     return () => window.clearInterval(tick);
+  }, []);
+
+  useEffect(() => {
+    const sync = () => setIsCompact(window.innerWidth <= 760);
+    sync();
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
   }, []);
 
   const year = view.getFullYear();
@@ -883,7 +905,7 @@ function Scheduler({ t }: { t: Theme }) {
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+        gridTemplateColumns: isCompact ? "1fr" : "repeat(2, minmax(0, 1fr))",
         gap: 14,
       }}
     >
@@ -1056,38 +1078,58 @@ function Portfolio({
   const [theme, setTheme] = useState<Theme>(baseTheme);
   const [darkMode, setDarkMode] = useState(false);
   const [active, setActive] = useState<NavKey>("about");
-  const [thoughts, setThoughts] = useState<ThoughtPreview[]>([]);
-  const [thoughtsLoaded, setThoughtsLoaded] = useState(false);
+  const [isCompact, setIsCompact] = useState(false);
+  const [notes, setNotes] = useState<NotePreview[]>([]);
+  const [notesLoaded, setNotesLoaded] = useState(false);
 
   const st = styles(theme);
 
   useEffect(() => {
     document.documentElement.style.background = theme.bg;
     document.body.style.background = theme.bg;
+    document.documentElement.dataset.theme = theme.dark ? "dark" : "light";
 
     return () => {
       document.documentElement.style.background = "";
       document.body.style.background = "";
     };
-  }, [theme.bg]);
+  }, [theme.bg, theme.dark]);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(THEME_STORAGE_KEY) === "dark") {
+        setDarkMode(true);
+        setTheme(DARK_EDITORIAL);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    const sync = () => setIsCompact(window.innerWidth <= 760);
+    sync();
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function loadThoughts() {
+    async function loadNotes() {
       try {
-        const res = await fetch("/api/thoughts");
-        if (!res.ok) throw new Error("Could not load thoughts.");
-        const data = (await res.json()) as ThoughtPreview[];
-        if (!cancelled) setThoughts(data);
+        const res = await fetch("/api/notes");
+        if (!res.ok) throw new Error("Could not load notes.");
+        const data = (await res.json()) as NotePreview[];
+        if (!cancelled) setNotes(data);
       } catch {
-        if (!cancelled) setThoughts([]);
+        if (!cancelled) setNotes([]);
       } finally {
-        if (!cancelled) setThoughtsLoaded(true);
+        if (!cancelled) setNotesLoaded(true);
       }
     }
 
-    loadThoughts();
+    loadNotes();
     return () => {
       cancelled = true;
     };
@@ -1122,19 +1164,48 @@ function Portfolio({
     setDarkMode((current) => {
       const next = !current;
       setTheme(next ? DARK_EDITORIAL : baseTheme);
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, next ? "dark" : "light");
+      } catch {
+        /* ignore */
+      }
       return next;
     });
   };
 
   return (
-    <div style={st.shell}>
+    <div style={{ ...st.shell, display: isCompact ? "block" : st.shell.display }}>
       {/* Sidebar */}
-      <aside style={{ ...st.sidebar, width: 310 }}>
-        <nav style={st.nav}>
+      <aside
+        style={{
+          ...st.sidebar,
+          width: isCompact ? "auto" : 310,
+          height: isCompact ? "auto" : st.sidebar.height,
+          padding: isCompact ? "14px 18px" : st.sidebar.padding,
+          zIndex: isCompact ? 10 : undefined,
+          borderBottom: isCompact ? `1px solid ${theme.border}` : "none",
+        }}
+      >
+        <nav
+          style={{
+            ...st.nav,
+            alignItems: isCompact ? "center" : st.nav.alignItems,
+            flexDirection: isCompact ? "row" : st.nav.flexDirection,
+            justifyContent: isCompact ? "flex-start" : undefined,
+            marginTop: isCompact ? 0 : st.nav.marginTop,
+            marginBottom: isCompact ? 0 : st.nav.marginBottom,
+            overflowX: isCompact ? "auto" : undefined,
+            paddingBottom: isCompact ? 2 : undefined,
+          }}
+        >
           {NAV.map(({ key, label }) => (
             <button
               key={key}
-              style={st.navItem(active === key)}
+              style={{
+                ...st.navItem(active === key),
+                flex: isCompact ? "0 0 auto" : undefined,
+                textAlign: isCompact ? "left" : "right",
+              }}
               onClick={() => scrollTo(key)}
             >
               {label}
@@ -1142,7 +1213,11 @@ function Portfolio({
           ))}
           <button
             aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-            style={st.modeButton}
+            style={{
+              ...st.modeButton,
+              flex: isCompact ? "0 0 auto" : undefined,
+              marginTop: isCompact ? 0 : st.modeButton.marginTop,
+            }}
             onClick={toggleDarkMode}
           >
             {darkMode ? <SunIcon /> : <MoonIcon />}
@@ -1151,8 +1226,8 @@ function Portfolio({
       </aside>
 
       {/* Main */}
-      <main style={st.main}>
-        <header style={st.header}>
+      <main style={{ ...st.main, padding: isCompact ? "0 22px 48px" : st.main.padding }}>
+        <header style={{ ...st.header, padding: isCompact ? "22px 0 34px" : st.header.padding }}>
           <div style={st.headerTop}>
             <div>
               <div style={st.brandName}>Genna B. Cervantes</div>
@@ -1164,7 +1239,9 @@ function Portfolio({
         {/* About */}
         <section id="about" style={st.section(false)}>
           <div style={st.eyebrow}>About</div>
-          <h1 style={st.title}>I build full-stack systems and AI tooling.</h1>
+          <h1 style={{ ...st.title, fontSize: isCompact ? 28 : st.title.fontSize }}>
+            I build full-stack systems and AI tooling.
+          </h1>
           <p style={st.lead}>
             I&apos;m a Software Engineer with experience across full-stack
             development, AI, and DevOps. I enjoy building reliable, scalable
@@ -1173,7 +1250,13 @@ function Portfolio({
             machine learning and data-driven technologies out of curiosity and a
             passion for continuous learning.
           </p>
-          <div style={{ ...st.grid2, marginTop: 24 }}>
+          <div
+            style={{
+              ...st.grid2,
+              gridTemplateColumns: isCompact ? "1fr" : st.grid2.gridTemplateColumns,
+              marginTop: 24,
+            }}
+          >
             {FOCUS.map((f) => (
               <div key={f} style={st.chip}>
                 {f}
@@ -1185,15 +1268,18 @@ function Portfolio({
         {/* Work */}
         <section id="work" style={st.section(false)}>
           <div style={st.eyebrow}>Experience</div>
-          <h2 style={st.title}>Where I&apos;ve worked</h2>
+          <h2 style={{ ...st.title, fontSize: isCompact ? 27 : st.title.fontSize }}>
+            Where I&apos;ve worked
+          </h2>
           <div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 26 }}>
             {WORK.map((job) => (
               <div
                 key={job.role}
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "128px minmax(0, 1fr)",
-                  columnGap: 20,
+                  gridTemplateColumns: isCompact ? "1fr" : "128px minmax(0, 1fr)",
+                  columnGap: isCompact ? 0 : 20,
+                  rowGap: isCompact ? 4 : 0,
                 }}
               >
                 <div
@@ -1201,15 +1287,26 @@ function Portfolio({
                     fontSize: 13,
                     color: theme.muted,
                     fontWeight: 600,
+                    lineHeight: 1.35,
+                    paddingTop: isCompact ? 0 : 2,
                   }}
                 >
                   {job.period}
                 </div>
-                <div style={{ fontSize: 15.5, fontWeight: 600 }}>{job.role}</div>
+                <div
+                  style={{
+                    fontSize: 15.5,
+                    fontWeight: 600,
+                    lineHeight: 1.35,
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {job.role}
+                </div>
                 <ul
                   style={{
                     gridColumn: "1 / -1",
-                    paddingLeft: 44,
+                    paddingLeft: isCompact ? 18 : 44,
                     fontSize: 14.5,
                     lineHeight: 1.6,
                     color: theme.muted,
@@ -1230,56 +1327,67 @@ function Portfolio({
         {/* Articles */}
         <section id="articles" style={st.section(false)}>
           <div style={st.eyebrow}>Writing</div>
-          <h2 style={st.title}>Thoughts and Notes</h2>
+          <h2 style={{ ...st.title, fontSize: isCompact ? 27 : st.title.fontSize }}>
+            Engineering Notes
+          </h2>
           <div style={{ marginTop: 24, display: "flex", flexDirection: "column" }}>
-            {!thoughtsLoaded && (
+            {!notesLoaded && (
               <p style={{ fontSize: 14, lineHeight: 1.55, color: theme.muted, margin: 0 }}>
-                Loading thoughts...
+                Loading notes...
               </p>
             )}
-            {thoughtsLoaded && thoughts.length === 0 && (
+            {notesLoaded && notes.length === 0 && (
               <p style={{ fontSize: 14, lineHeight: 1.55, color: theme.muted, margin: 0 }}>
-                No thoughts published yet.
+                No notes published yet.
               </p>
             )}
-            {thoughts.map((thought, i) => (
+            {notes.map((note, i) => (
               <a
-                key={thought.slug}
-                href={`/thoughts/${thought.slug}`}
+                key={note.slug}
+                href={`/notes/${note.slug}`}
                 style={{
                   textDecoration: "none",
                   color: "inherit",
                   padding: "18px 0",
                   borderTop: i === 0 ? "none" : `1px solid ${theme.border}`,
                   display: "grid",
-                  gridTemplateColumns: "90px minmax(0, 1fr)",
-                  columnGap: 8,
+                  gridTemplateColumns: isCompact ? "1fr" : "90px minmax(0, 1fr)",
+                  columnGap: isCompact ? 0 : 8,
+                  rowGap: isCompact ? 6 : 0,
                 }}
               >
-                <div style={{ fontSize: 13, color: theme.muted, fontWeight: 600 }}>
-                  {formatThoughtDate(thought.date)}
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: theme.muted,
+                    fontWeight: 600,
+                    lineHeight: 1.35,
+                    paddingTop: isCompact ? 0 : 2,
+                  }}
+                >
+                  {formatNoteDate(note.date)}
                 </div>
                 <div
                   style={{
-                    fontFamily: theme.display,
-                    fontWeight: theme.titleWeight,
-                    fontSize: 19,
-                    lineHeight: 1.2,
+                    fontSize: 15.5,
+                    fontWeight: 600,
+                    lineHeight: 1.35,
+                    overflowWrap: "anywhere",
                   }}
                 >
-                  {thought.title}
+                  {note.title}
                 </div>
                 <div
                   style={{
                     gridColumn: "1 / -1",
-                    paddingLeft: 44,
+                    paddingLeft: isCompact ? 0 : 44,
                     fontSize: 14,
                     lineHeight: 1.55,
                     color: theme.muted,
                     marginTop: 8,
                   }}
                 >
-                  {thought.description}
+                  {note.description}
                 </div>
               </a>
             ))}
@@ -1289,7 +1397,9 @@ function Portfolio({
         {/* Schedule */}
         <section id="schedule" style={st.section(false)}>
           <div style={st.eyebrow}>Schedule</div>
-          <h2 style={st.title}>Book a 30-min intro call</h2>
+          <h2 style={{ ...st.title, fontSize: isCompact ? 27 : st.title.fontSize }}>
+            Book a 30-min intro call
+          </h2>
           <p style={st.lead}>Grab a slot below — 30 minutes, no agenda required.</p>
           <div style={{ marginTop: 24 }}>
             <Scheduler t={theme} />
@@ -1299,11 +1409,19 @@ function Portfolio({
         {/* Contact */}
         <section id="contact" style={st.section(true)}>
           <div style={st.eyebrow}>Contact</div>
-          <h2 style={st.title}>Get in touch</h2>
+          <h2 style={{ ...st.title, fontSize: isCompact ? 27 : st.title.fontSize }}>
+            Get in touch
+          </h2>
           <p style={st.lead}>
             Reach me through email, phone, or GitHub.
           </p>
-          <div style={{ ...st.grid2, marginTop: 24 }}>
+          <div
+            style={{
+              ...st.grid2,
+              gridTemplateColumns: isCompact ? "1fr" : st.grid2.gridTemplateColumns,
+              marginTop: 24,
+            }}
+          >
             {CONTACTS.map((c) => (
               <a
                 key={c.label}

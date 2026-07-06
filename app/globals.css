@@ -8,6 +8,12 @@ body {
   background: #f5ebee;
 }
 
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+  background: #111114;
+  color-scheme: dark;
+}
+
 /* Thin custom scrollbars */
 * {
   scrollbar-width: thin;
@@ -32,14 +38,14 @@ button:focus {
   outline: none;
 }
 
-.thought-shell {
+.notes-shell {
   background: #f5ebee;
   color: #24191d;
   display: flex;
   min-height: 100vh;
 }
 
-.thought-sidebar {
+.notes-sidebar {
   align-self: flex-start;
   background: #f5ebee;
   flex-shrink: 0;
@@ -51,7 +57,7 @@ button:focus {
   width: 310px;
 }
 
-.thought-nav {
+.notes-nav {
   align-items: flex-end;
   display: flex;
   flex-direction: column;
@@ -60,7 +66,7 @@ button:focus {
   min-height: calc(100vh - 56px);
 }
 
-.thought-nav a {
+.notes-nav a {
   border-radius: 8px;
   color: #24191d;
   font-family: "Instrument Sans", sans-serif;
@@ -70,100 +76,122 @@ button:focus {
   text-decoration: none;
 }
 
-.thought-nav a:hover {
+.notes-nav a:hover {
   background: #ecdee3;
   color: #7f4054;
 }
 
-.thought-nav .thought-back-link {
+.notes-nav .notes-back-link {
   color: #7f4054;
   cursor: pointer;
   font-weight: 700;
   margin-bottom: 16px;
 }
 
-.thought-nav .thought-back-link:hover {
+.notes-nav .notes-back-link:hover {
   background: transparent;
   color: #7f4054;
 }
 
-.thought-nav a.is-active {
+.notes-nav a.is-active {
   background: #ecdee3;
   color: #7f4054;
   font-weight: 600;
 }
 
-.thought-nav .thought-nav-nested {
+.notes-nav .notes-nav-nested {
   color: #87747b;
   font-size: 12.5px;
   padding-right: 20px;
 }
 
-.thought-nav .thought-nav-nested.is-active {
+.notes-nav .notes-nav-nested.is-active {
   color: #7f4054;
 }
 
-.thought-page {
+.notes-page {
   flex: 1;
   min-width: 0;
   padding: 0 80px 64px;
   font-family: "Instrument Sans", sans-serif;
 }
 
-.thought-page article {
-  max-width: 660px;
-  padding-top: 92px;
+.notes-header {
+  background: linear-gradient(#f5ebee 0%, #f5ebee 62%, #f5ebee00 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 26px 0 44px;
+  pointer-events: none;
+  position: sticky;
+  top: 0;
+  z-index: 6;
 }
 
-.thought-date {
+.notes-title {
+  color: #7f4054;
+  font-family: "Newsreader", serif;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.notes-date {
   color: #87747b;
-  font-size: 13px;
+  font-size: 10.5px;
   font-weight: 600;
-  margin-bottom: 12px;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
-.thought-content h1,
-.thought-content h2,
-.thought-content h3 {
+.notes-page article {
+  max-width: 660px;
+}
+
+.notes-content h1,
+.notes-content h2,
+.notes-content h3 {
   font-family: "Newsreader", serif;
   font-weight: 500;
   line-height: 1.12;
 }
 
-.thought-content h1 {
+.notes-content h1 {
   font-size: 40px;
   margin: 0 0 24px;
 }
 
-.thought-content h2 {
+.notes-content h2 {
   font-size: 28px;
   margin: 36px 0 14px;
   scroll-margin-top: 28px;
 }
 
-.thought-content h3 {
+.notes-content h3 {
   font-size: 22px;
   margin: 28px 0 12px;
   scroll-margin-top: 28px;
 }
 
-.thought-content p,
-.thought-content li {
+.notes-content p,
+.notes-content li {
   color: #5f4f55;
   font-size: 16px;
   line-height: 1.75;
 }
 
-.thought-content p {
+.notes-content p {
   margin: 0 0 18px;
 }
 
-.thought-content ul {
+.notes-content ul {
   margin: 0 0 22px;
   padding-left: 24px;
 }
 
-.thought-content code {
+.notes-content code {
   background: #ecdee3;
   border-radius: 4px;
   color: #7f4054;
@@ -171,19 +199,64 @@ button:focus {
   padding: 2px 5px;
 }
 
+html[data-theme="dark"] .notes-shell,
+html[data-theme="dark"] .notes-sidebar {
+  background: #111114;
+  color: #f7f3f5;
+}
+
+html[data-theme="dark"] .notes-header {
+  background: linear-gradient(#111114 0%, #111114 62%, #11111400 100%);
+}
+
+html[data-theme="dark"] .notes-title,
+html[data-theme="dark"] .notes-nav .notes-back-link,
+html[data-theme="dark"] .notes-nav .notes-back-link:hover,
+html[data-theme="dark"] .notes-nav a.is-active,
+html[data-theme="dark"] .notes-nav .notes-nav-nested.is-active,
+html[data-theme="dark"] .notes-content h1,
+html[data-theme="dark"] .notes-content h2,
+html[data-theme="dark"] .notes-content h3 {
+  color: #f0a8bd;
+}
+
+html[data-theme="dark"] .notes-date,
+html[data-theme="dark"] .notes-nav .notes-nav-nested {
+  color: #c7bcc2;
+}
+
+html[data-theme="dark"] .notes-nav a {
+  color: #f7f3f5;
+}
+
+html[data-theme="dark"] .notes-nav a:hover,
+html[data-theme="dark"] .notes-nav a.is-active {
+  background: #33242b;
+}
+
+html[data-theme="dark"] .notes-content p,
+html[data-theme="dark"] .notes-content li {
+  color: #c7bcc2;
+}
+
+html[data-theme="dark"] .notes-content code {
+  background: #33242b;
+  color: #f0a8bd;
+}
+
 @media (max-width: 760px) {
-  .thought-shell {
+  .notes-shell {
     display: block;
   }
 
-  .thought-sidebar {
+  .notes-sidebar {
     height: auto;
     padding: 18px 24px 0;
     position: static;
     width: auto;
   }
 
-  .thought-nav {
+  .notes-nav {
     align-items: flex-start;
     flex-direction: row;
     justify-content: flex-start;
@@ -192,16 +265,21 @@ button:focus {
     padding-bottom: 12px;
   }
 
-  .thought-nav a {
+  .notes-nav a {
     flex: 0 0 auto;
     text-align: left;
   }
 
-  .thought-nav .thought-nav-nested {
+  .notes-nav .notes-nav-nested {
     padding-right: 12px;
   }
 
-  .thought-page {
+  .notes-page {
     padding: 42px 24px;
+  }
+
+  .notes-header {
+    margin: -42px 0 14px;
+    padding: 18px 0 32px;
   }
 }
