@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  CSSProperties,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { CSSProperties, useCallback, useEffect, useState } from "react";
 
 /* ------------------------------------------------------------------ *
  * Theme system — a single object drives every color, font, and radius
@@ -230,7 +225,11 @@ function formatNoteDate(date: string) {
 const SLOTS = ["8:00 AM", "8:30 AM", "5:00 PM", "5:30 PM"];
 
 const CONTACTS = [
-  { label: "Email", value: "gennacervantes9@gmail.com", href: "mailto:gennacervantes9@gmail.com" },
+  {
+    label: "Email",
+    value: "gennacervantes9@gmail.com",
+    href: "mailto:gennacervantes9@gmail.com",
+  },
   {
     label: "GitHub",
     value: "github.com/genna-cervantes",
@@ -660,19 +659,32 @@ function PazzazzPanel({
       }}
     >
       <div style={{ display: "flex", gap: 16, marginBottom: 12 }}>
-        <button style={tabBtn("pazzazz", "✦ Pazzazz")} onClick={() => setTab("pazzazz")}>
+        <button
+          style={tabBtn("pazzazz", "✦ Pazzazz")}
+          onClick={() => setTab("pazzazz")}
+        >
           ✦ Pazzazz
         </button>
-        <button style={tabBtn("history", "History")} onClick={() => setTab("history")}>
+        <button
+          style={tabBtn("history", "History")}
+          onClick={() => setTab("history")}
+        >
           History
         </button>
       </div>
 
       {tab === "pazzazz" ? (
         <div>
-          <p style={{ fontSize: 12, lineHeight: 1.5, color: t.muted, margin: "0 0 10px" }}>
-            Reshape how this site looks — colors, fonts, the whole vibe. The words
-            and content stay exactly as they are.
+          <p
+            style={{
+              fontSize: 12,
+              lineHeight: 1.5,
+              color: t.muted,
+              margin: "0 0 10px",
+            }}
+          >
+            Reshape how this site looks — colors, fonts, the whole vibe. The
+            words and content stay exactly as they are.
           </p>
           <textarea
             value={prompt}
@@ -703,7 +715,14 @@ function PazzazzPanel({
             {busy ? "Working…" : "Add pazzazz"}
           </button>
           {note && (
-            <p style={{ fontSize: 11.5, lineHeight: 1.5, color: t.muted, margin: "10px 0 0" }}>
+            <p
+              style={{
+                fontSize: 11.5,
+                lineHeight: 1.5,
+                color: t.muted,
+                margin: "10px 0 0",
+              }}
+            >
               {note}
             </p>
           )}
@@ -711,7 +730,14 @@ function PazzazzPanel({
       ) : (
         <div>
           {log.length === 0 ? (
-            <p style={{ fontSize: 12, lineHeight: 1.5, color: t.muted, margin: 0 }}>
+            <p
+              style={{
+                fontSize: 12,
+                lineHeight: 1.5,
+                color: t.muted,
+                margin: 0,
+              }}
+            >
               No restyles yet — switch to Pazzazz and be the first.
             </p>
           ) : (
@@ -740,7 +766,9 @@ function PazzazzPanel({
                     padding: "8px 10px",
                   }}
                 >
-                  <span style={{ fontSize: 12.5, fontWeight: 600 }}>{entry.label}</span>
+                  <span style={{ fontSize: 12.5, fontWeight: 600 }}>
+                    {entry.label}
+                  </span>
                   <span style={{ fontSize: 11, color: t.muted }}>
                     {relativeTime(entry.ts)}
                   </span>
@@ -760,8 +788,18 @@ function PazzazzPanel({
 
 const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 function sameDay(a: Date, b: Date) {
@@ -780,7 +818,13 @@ function slotToDate(date: Date, slot: string) {
   const meridiem = match[3];
   if (meridiem === "PM" && hours !== 12) hours += 12;
   if (meridiem === "AM" && hours === 12) hours = 0;
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes);
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    hours,
+    minutes,
+  );
 }
 
 function googleCalendarTimestamp(date: Date) {
@@ -858,7 +902,7 @@ function Scheduler({ t }: { t: Theme }) {
         const starts = Array.isArray(data?.bookings)
           ? data.bookings
               .map((booking: { start?: unknown }) =>
-                typeof booking.start === "string" ? booking.start : ""
+                typeof booking.start === "string" ? booking.start : "",
               )
               .filter(Boolean)
           : [];
@@ -882,7 +926,7 @@ function Scheduler({ t }: { t: Theme }) {
   const todayMidnight = new Date(
     now.getFullYear(),
     now.getMonth(),
-    now.getDate()
+    now.getDate(),
   );
 
   const cells: (Date | null)[] = [];
@@ -904,7 +948,9 @@ function Scheduler({ t }: { t: Theme }) {
 
   const isSlotBooked = (slot: string) => {
     if (!selectedDate) return false;
-    return unavailableStarts.includes(slotToDate(selectedDate, slot).toISOString());
+    return unavailableStarts.includes(
+      slotToDate(selectedDate, slot).toISOString(),
+    );
   };
 
   const fmtDate = (d: Date) =>
@@ -912,7 +958,7 @@ function Scheduler({ t }: { t: Theme }) {
       weekday: "short",
       month: "short",
       day: "numeric",
-  });
+    });
 
   const openCalendarLink = async () => {
     if (
@@ -943,11 +989,13 @@ function Scheduler({ t }: { t: Theme }) {
       window.open(googleCalendarLink(start), "_blank", "noopener,noreferrer");
       setBookingMessage("Slot reserved. Finish saving it in Google Calendar.");
       setUnavailableStarts((current) =>
-        current.includes(start.toISOString()) ? current : [...current, start.toISOString()]
+        current.includes(start.toISOString())
+          ? current
+          : [...current, start.toISOString()],
       );
     } catch (error) {
       setBookingMessage(
-        error instanceof Error ? error.message : "Could not reserve that slot."
+        error instanceof Error ? error.message : "Could not reserve that slot.",
       );
     } finally {
       setBookingBusy(false);
@@ -1015,7 +1063,13 @@ function Scheduler({ t }: { t: Theme }) {
           ))}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(7, 1fr)",
+            gap: 4,
+          }}
+        >
           {cells.map((date, i) => {
             if (!date) return <div key={`e-${i}`} />;
             const disabled = isDisabled(date);
@@ -1038,11 +1092,7 @@ function Scheduler({ t }: { t: Theme }) {
                   fontSize: 13,
                   cursor: disabled ? "default" : "pointer",
                   background: selected ? t.accent : "transparent",
-                  color: selected
-                    ? t.accentText
-                    : disabled
-                      ? t.muted
-                      : t.text,
+                  color: selected ? t.accentText : disabled ? t.muted : t.text,
                   opacity: disabled ? 0.35 : 1,
                   fontWeight: selected ? 700 : 400,
                 }}
@@ -1114,7 +1164,7 @@ function Scheduler({ t }: { t: Theme }) {
                 !selectedDate ||
                 !selectedTime ||
                 isSlotDisabled(selectedTime) ||
-                isSlotBooked(selectedTime)
+                isSlotBooked(selectedTime),
             ),
             width: "100%",
             marginTop: 16,
@@ -1135,7 +1185,14 @@ function Scheduler({ t }: { t: Theme }) {
               : "Select a time"}
         </button>
         {bookingMessage && (
-          <p style={{ fontSize: 12, lineHeight: 1.5, color: t.muted, margin: "10px 0 0" }}>
+          <p
+            style={{
+              fontSize: 12,
+              lineHeight: 1.5,
+              color: t.muted,
+              margin: "10px 0 0",
+            }}
+          >
             {bookingMessage}
           </p>
         )}
@@ -1219,7 +1276,8 @@ function Portfolio({
     const onScroll = () => {
       let current: NavKey = NAV[0].key;
       const atBottom =
-        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 2;
       if (atBottom) {
         setActive(NAV[NAV.length - 1].key);
         return;
@@ -1253,7 +1311,9 @@ function Portfolio({
   };
 
   return (
-    <div style={{ ...st.shell, display: isCompact ? "block" : st.shell.display }}>
+    <div
+      style={{ ...st.shell, display: isCompact ? "block" : st.shell.display }}
+    >
       {/* Sidebar */}
       <aside
         style={{
@@ -1291,7 +1351,9 @@ function Portfolio({
             </button>
           ))}
           <button
-            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label={
+              darkMode ? "Switch to light mode" : "Switch to dark mode"
+            }
             style={{
               ...st.modeButton,
               flex: isCompact ? "0 0 auto" : undefined,
@@ -1305,8 +1367,18 @@ function Portfolio({
       </aside>
 
       {/* Main */}
-      <main style={{ ...st.main, padding: isCompact ? "0 22px 48px" : st.main.padding }}>
-        <header style={{ ...st.header, padding: isCompact ? "22px 0 34px" : st.header.padding }}>
+      <main
+        style={{
+          ...st.main,
+          padding: isCompact ? "0 22px 48px" : st.main.padding,
+        }}
+      >
+        <header
+          style={{
+            ...st.header,
+            padding: isCompact ? "22px 0 34px" : st.header.padding,
+          }}
+        >
           <div style={st.headerTop}>
             <div>
               <div style={st.brandName}>Genna B. Cervantes</div>
@@ -1318,16 +1390,28 @@ function Portfolio({
         {/* About */}
         <section id="about" style={st.section(false)}>
           <div style={st.eyebrow}>About</div>
-          <h1 style={{ ...st.title, fontSize: isCompact ? 28 : st.title.fontSize }}>
+          <h1
+            style={{
+              ...st.title,
+              fontSize: isCompact ? 28 : st.title.fontSize,
+            }}
+          >
             Building What&apos;s Next
           </h1>
           <p style={st.lead}>
-            I enjoy turning ideas into software, from full-stack applications to AI-powered tools and the infrastructure behind them. I care about building reliable, scalable systems with a focus on dev ex, performance, and engineering efficiency. Outside of work, I enjoy exploring data and machine learning, driven by curiosity and a constant desire to build better software.
+            I enjoy turning ideas into software, from full-stack applications to
+            AI-powered tools and the infrastructure behind them. I care about
+            building reliable, scalable systems with a focus on dev ex,
+            performance, and engineering efficiency. Outside of work, I enjoy
+            exploring data and machine learning, driven by curiosity and a
+            constant desire to build better software.
           </p>
           <div
             style={{
               ...st.grid2,
-              gridTemplateColumns: isCompact ? "1fr" : st.grid2.gridTemplateColumns,
+              gridTemplateColumns: isCompact
+                ? "1fr"
+                : st.grid2.gridTemplateColumns,
               marginTop: 24,
             }}
           >
@@ -1342,16 +1426,30 @@ function Portfolio({
         {/* Work */}
         <section id="work" style={st.section(false)}>
           <div style={st.eyebrow}>Experience</div>
-          <h2 style={{ ...st.title, fontSize: isCompact ? 27 : st.title.fontSize }}>
+          <h2
+            style={{
+              ...st.title,
+              fontSize: isCompact ? 27 : st.title.fontSize,
+            }}
+          >
             Where I&apos;ve worked
           </h2>
-          <div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 26 }}>
+          <div
+            style={{
+              marginTop: 28,
+              display: "flex",
+              flexDirection: "column",
+              gap: 26,
+            }}
+          >
             {WORK.map((job) => (
               <div
                 key={job.role}
                 style={{
                   display: "grid",
-                  gridTemplateColumns: isCompact ? "1fr" : "128px minmax(0, 1fr)",
+                  gridTemplateColumns: isCompact
+                    ? "1fr"
+                    : "128px minmax(0, 1fr)",
                   columnGap: isCompact ? 0 : 20,
                   rowGap: isCompact ? 4 : 0,
                 }}
@@ -1401,17 +1499,38 @@ function Portfolio({
         {/* Articles */}
         <section id="articles" style={st.section(false)}>
           <div style={st.eyebrow}>Writing</div>
-          <h2 style={{ ...st.title, fontSize: isCompact ? 27 : st.title.fontSize }}>
+          <h2
+            style={{
+              ...st.title,
+              fontSize: isCompact ? 27 : st.title.fontSize,
+            }}
+          >
             Engineering Notes
           </h2>
-          <div style={{ marginTop: 24, display: "flex", flexDirection: "column" }}>
+          <div
+            style={{ marginTop: 24, display: "flex", flexDirection: "column" }}
+          >
             {!notesLoaded && (
-              <p style={{ fontSize: 14, lineHeight: 1.55, color: theme.muted, margin: 0 }}>
+              <p
+                style={{
+                  fontSize: 14,
+                  lineHeight: 1.55,
+                  color: theme.muted,
+                  margin: 0,
+                }}
+              >
                 Loading notes...
               </p>
             )}
             {notesLoaded && notes.length === 0 && (
-              <p style={{ fontSize: 14, lineHeight: 1.55, color: theme.muted, margin: 0 }}>
+              <p
+                style={{
+                  fontSize: 14,
+                  lineHeight: 1.55,
+                  color: theme.muted,
+                  margin: 0,
+                }}
+              >
                 No notes published yet.
               </p>
             )}
@@ -1425,7 +1544,9 @@ function Portfolio({
                   padding: "18px 0",
                   borderTop: i === 0 ? "none" : `1px solid ${theme.border}`,
                   display: "grid",
-                  gridTemplateColumns: isCompact ? "1fr" : "90px minmax(0, 1fr)",
+                  gridTemplateColumns: isCompact
+                    ? "1fr"
+                    : "90px minmax(0, 1fr)",
                   columnGap: isCompact ? 0 : 8,
                   rowGap: isCompact ? 6 : 0,
                 }}
@@ -1453,26 +1574,36 @@ function Portfolio({
                 </div>
                 <div
                   style={{
-                    gridColumn: "1 / -1",
-                    paddingLeft: isCompact ? 0 : 44,
-                    fontSize: 14,
-                    lineHeight: 1.55,
-                    color: theme.muted,
-                    marginTop: 8,
                     display: "flex",
-                    alignItems: "center",
+                    flexDirection: "column",
+                    gridColumn: "1 / -1",
                   }}
                 >
-                  {note.description}
-                  <span
+                  <div
+                    style={{
+                      gridColumn: "1 / -1",
+                      paddingLeft: isCompact ? 0 : 44,
+                      fontSize: 14,
+                      lineHeight: 1.55,
+                      color: theme.muted,
+                      marginTop: 8,
+                      flex: 1
+                    }}
+                  >
+                    {note.description}
+                  </div>
+                  <div
                     style={{
                       fontSize: 12,
                       fontWeight: 600,
-                      paddingLeft: 6,
+                      color: theme.muted,
+                      paddingLeft: isCompact ? 0 : 44,
+                      fontStyle: "italic",
+                      marginTop: 6,
                     }}
-                    >
-                       · {note.readTime}
-                  </span>
+                  >
+                    {note.readTime}
+                  </div>
                 </div>
               </a>
             ))}
@@ -1494,16 +1625,21 @@ function Portfolio({
         {/* Contact */}
         <section id="contact" style={st.section(true)}>
           <div style={st.eyebrow}>Contact</div>
-          <h2 style={{ ...st.title, fontSize: isCompact ? 27 : st.title.fontSize }}>
+          <h2
+            style={{
+              ...st.title,
+              fontSize: isCompact ? 27 : st.title.fontSize,
+            }}
+          >
             Get in touch
           </h2>
-          <p style={st.lead}>
-            Reach me through email or GitHub.
-          </p>
+          <p style={st.lead}>Reach me through email or GitHub.</p>
           <div
             style={{
               ...st.grid2,
-              gridTemplateColumns: isCompact ? "1fr" : st.grid2.gridTemplateColumns,
+              gridTemplateColumns: isCompact
+                ? "1fr"
+                : st.grid2.gridTemplateColumns,
               marginTop: 24,
             }}
           >
@@ -1511,12 +1647,21 @@ function Portfolio({
               <a
                 key={c.label}
                 href={c.href}
-                style={{ ...st.card, textDecoration: "none", color: "inherit", display: "block" }}
+                style={{
+                  ...st.card,
+                  textDecoration: "none",
+                  color: "inherit",
+                  display: "block",
+                }}
               >
-                <div style={{ fontSize: 12, color: theme.muted, marginBottom: 4 }}>
+                <div
+                  style={{ fontSize: 12, color: theme.muted, marginBottom: 4 }}
+                >
                   {c.label}
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: theme.accent }}>
+                <div
+                  style={{ fontSize: 15, fontWeight: 600, color: theme.accent }}
+                >
                   {c.value}
                 </div>
               </a>
@@ -1524,7 +1669,6 @@ function Portfolio({
           </div>
         </section>
       </main>
-
     </div>
   );
 }
