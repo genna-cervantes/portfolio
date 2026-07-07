@@ -11,7 +11,7 @@ import {
  * Theme system — a single object drives every color, font, and radius
  * ------------------------------------------------------------------ */
 
-type Theme = {
+export type Theme = {
   label: string;
   bg: string;
   surface: string;
@@ -33,7 +33,7 @@ type StartingStyle = "Editorial" | "Technical" | "Bold";
 
 const THEME_STORAGE_KEY = "portfolio-theme";
 
-const PRESETS: Record<StartingStyle, Theme> = {
+export const PRESETS: Record<StartingStyle, Theme> = {
   Editorial: {
     label: "Editorial",
     bg: "#f5ebee",
@@ -213,6 +213,7 @@ type NotePreview = {
   title: string;
   date: string;
   description: string;
+  readTime: string;
 };
 
 function formatNoteDate(date: string) {
@@ -1458,9 +1459,20 @@ function Portfolio({
                     lineHeight: 1.55,
                     color: theme.muted,
                     marginTop: 8,
+                    display: "flex",
+                    alignItems: "center",
                   }}
                 >
                   {note.description}
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      paddingLeft: 6,
+                    }}
+                    >
+                       · {note.readTime}
+                  </span>
                 </div>
               </a>
             ))}

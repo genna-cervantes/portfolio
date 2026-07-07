@@ -78,7 +78,7 @@ export default async function NotePage({
       <main className="notes-page">
         <header className="notes-header">
           <div className="notes-title">{note.title}</div>
-          <div className="notes-date">{note.date}</div>
+          <div className="notes-date">{note.date} · {note.readTime}</div>
         </header>
         <article id="top" className="notes-content">
           <ReactMarkdown
@@ -99,6 +99,10 @@ export default async function NotePage({
             {note.content}
           </ReactMarkdown>
         </article>
+        <a href={`#top`} style={{fontSize: 13,
+                    color: "#7f4054",
+                    fontWeight: 600,
+                    textDecoration: 'none'}}>Back to top ↑</a>
       </main>
     </div>
   );

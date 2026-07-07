@@ -1,7 +1,8 @@
 ---
 title: Offline Support Without Another Mental Model
 date: July 7, 2026
-description: The best way to add an API is to make it feel like it was already there.
+description: The best way to add an API is to make it feel like it was already there
+readTime: 5 min read
 ---
 ## The problem isn't offline support
 

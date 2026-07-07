@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import { promises as fs, read } from "fs";
 import path from "path";
 
 export type NoteMeta = {
@@ -6,6 +6,7 @@ export type NoteMeta = {
   title: string;
   date: string;
   description: string;
+  readTime: string;
 };
 
 export type NoteHeading = {
@@ -83,6 +84,7 @@ export async function getNote(slug: string): Promise<Note> {
     title: meta.title || slug,
     date: meta.date || "",
     description: meta.description || "",
+    readTime: meta.readTime || "",
     content: body,
     headings: extractHeadings(body),
   };
@@ -93,11 +95,12 @@ export async function getNotes(): Promise<NoteMeta[]> {
   const notes = await Promise.all(slugs.map((slug) => getNote(slug)));
 
   return notes
-    .map(({ slug, title, date, description }) => ({
+    .map(({ slug, title, date, description, readTime }) => ({
       slug,
       title,
       date,
       description,
+      readTime
     }))
     .sort((a, b) => b.date.localeCompare(a.date));
 }
