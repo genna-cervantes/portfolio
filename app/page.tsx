@@ -157,7 +157,7 @@ const NAV = [
   { key: "about", label: "About" },
   { key: "work", label: "Work" },
   { key: "articles", label: "Notes" },
-  { key: "schedule", label: "Schedule" },
+  // { key: "schedule", label: "Schedule" },
   { key: "contact", label: "Contact" },
 ] as const;
 
@@ -175,40 +175,35 @@ const WORK = [
     period: "Jan 2026 - Present",
     role: "Junior Software Engineer · oboda",
     bullets: [
-      "Delivered AI and core product features, including offline capabilities, codebase improvements, and production hotfixes. Served in the on-call rotation, consistently attending to critical production issues in under 60 minutes while maintaining product reliability.",
-      "Improved engineering efficiency by strengthening code review standards, auditing and optimizing GitHub Actions workflows, and streamlining developer processes, reducing CI execution time by 50% and helping accelerate delivery across the team.",
-      "Owned the release process and automated deployments, reducing release time by 80%, eliminating repetitive manual steps, and increasing deployment reliability across engineering teams.",
+      "Built AI and core product features while improving the engineering platform through release automation, CI/CD optimizations, and developer tooling. Regularly handled production incidents as part of the on-call rotation, delivering reliable fixes for critical customer issues.",
     ],
   },
   {
     period: "Jan 2026 - Apr 2026",
     role: "Post Trade Engineer Intern · Macquarie Group",
     bullets: [
-      "Automated service status monitoring by building a notification script in Python, eliminating manual checks and improving response time; later scaled for use across multiple core application modules.",
-      "Implemented cron-based background jobs in Java applications to support automated notifications and scheduled processes.",
+      "Developed internal automation for service monitoring and scheduled workflows using Python and Java, reducing manual operational work and improving visibility across enterprise applications.",
     ],
   },
   {
     period: "Jul 2025 - Dec 2025",
     role: "Full Stack Developer Intern · Kippap Learning Corporation",
     bullets: [
-      "Designed and implemented an AI evaluation framework used across the Innovation Team to benchmark and validate new AI products, automating about 80% of manual testing and reducing evaluation time by 60%.",
-      "Led full-stack development of key features, including discount systems and a secure online contract signing workflow.",
+      "Designed and built an AI evaluation framework to benchmark new AI products, while delivering full-stack product features including discount systems and secure digital contract signing.",
     ],
   },
   {
     period: "Mar 2025 - Aug 2025",
     role: "Full Stack Developer Intern · Kapiton",
     bullets: [
-      "Established the frontend foundation for the migration from Laravel to a modern React stack, implementing standardized architecture patterns and integrating production-grade tools like TanStack Query.",
+      "Led the frontend modernization from Laravel to React by establishing scalable architecture, introducing standardized engineering patterns, and integrating modern data-fetching infrastructure.",
     ],
   },
   {
     period: "Sep 2024 - Dec 2024",
     role: "Software Engineer · Dormy PH",
     bullets: [
-      "Designed and implemented microservices, including an analytics engine and a consistency listing checker, built with TypeScript and hosted on AWS Lambda to enable near real-time insights and reduce inconsistent listings by 90%.",
-      "Re-architected site search on an open-source stack, cutting latency by at least 50%.",
+      "Designed and developed serverless backend services, including analytics and data validation systems, while re-architecting search to improve application performance and data consistency.",
     ],
   },
 ];
@@ -1473,7 +1468,7 @@ function Portfolio({
         </section>
 
         {/* Schedule */}
-        <section id="schedule" style={st.section(false)}>
+        {/* <section id="schedule" style={st.section(false)}>
           <div style={st.eyebrow}>Schedule</div>
           <h2 style={{ ...st.title, fontSize: isCompact ? 27 : st.title.fontSize }}>
             Book a 30-min intro call
@@ -1482,7 +1477,7 @@ function Portfolio({
           <div style={{ marginTop: 24 }}>
             <Scheduler t={theme} />
           </div>
-        </section>
+        </section> */}
 
         {/* Contact */}
         <section id="contact" style={st.section(true)}>

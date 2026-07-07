@@ -135,10 +135,68 @@ At this point, we'd achieved something I cared about from the very beginning.
 
 The offline layer isn't introducing a *new* way of fetching data. It follows the same pattern every developer already knows.
 
-This is **Convention over Configuration** in practice. Rather than asking developers to learn a new API for one feature, we follow conventions they already know. The implementation is completely different, but the way you interact with it isn't.
+This is *Convention over Configuration* in practice. Rather than asking developers to learn a new API for one feature, we follow conventions they already know. The implementation is completely different, but the way you interact with it isn't.
 
 That's the real value of designing the abstraction first.
 
 By mirroring the existing tRPC API and building around a reusable factory, I wasn't optimizing for the first offline endpoint. I was optimizing for the tenth, the twentieth, and every one after that.
 
 The API stays stable while the implementation is free to evolve.
+
+
+## Outtakes: where I'd take this next
+
+Of course, this probably isn't the last iteration of the API.  One thing I can already see improving is removing the decision from the caller entirely of which data source to use.
+
+Right now, a component might still need to do something like this:
+
+```tsx
+const { data: offlineProducts } =
+  offlineApi.v1.products.findMany.useQuery(...)
+
+const { data: products } =
+  api.v1.products.findMany.useQuery(...)
+
+const productList = isOffline ? offlineProducts : products
+```
+
+It works, but the caller still has to know that there are two sources of data.  A future version could hide that behind the exact same query signature:
+
+```tsx
+const { data: productList } =
+  combinedApi.v1.products.findMany.useQuery(...)
+```
+
+Internally, it decides where the data should come from:
+
+```tsx
+const findMany = () => {
+  // ... online query
+  // ... offline query
+
+  return isOffline ? offlineProducts : products
+}
+```
+
+That pushes the abstraction one level further.
+
+Instead of every component deciding whether to read from the online or offline API, that decision could be configured globally.
+
+For example, we could choose whether the application prefers the server first:
+
+```tsx
+export const combinedApi = createApi({
+  strategy: "server-first",
+})
+```
+
+Or whether it should behave more like a local-first application:
+
+```tsx
+export const combinedApi = createApi({
+  strategy: "local-first",
+})
+```
+
+The component no longer cares whether the data came from the server, IndexedDB, a cache, or some sync layer in between.  It simply asks for products.
+
