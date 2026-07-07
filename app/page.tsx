@@ -28,7 +28,7 @@ type StartingStyle = "Editorial" | "Technical" | "Bold";
 
 const THEME_STORAGE_KEY = "portfolio-theme";
 
-export const PRESETS: Record<StartingStyle, Theme> = {
+const PRESETS: Record<StartingStyle, Theme> = {
   Editorial: {
     label: "Editorial",
     bg: "#f5ebee",
