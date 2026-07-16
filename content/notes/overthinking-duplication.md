@@ -1,12 +1,12 @@
 ---
-title: Premature abstraction is the root of all headaches
+title: Premature Abstraction Is The Root of All Headaches
 date: July 16, 2026
 description: A short reflection on when duplicated code is better left alone
 readTime: 5.5 min read
 ---
 ## The duplication question
 
-I overthink duplication a lot.  Whenever I see repeated code, I pause and think to myself: should I leave this alone or should I abstract it?  And that sounds simple enough until I’m staring at real code in a production codebase.
+I overthink duplication a lot.  Whenever I see repeated code, I pause and think to myself: should I leave this alone or should I abstract it?  Which sounds simple enough until I’m staring at real actual code in a production codebase.
 
 
 ## When DRY is obviously right
@@ -37,7 +37,7 @@ const promoServices = services
   }))
 ```
 
-In this case, extracting the logic feels right.
+In this case, extracting the logic feels correct.
 
 ```tsx
 const getActivePromoItems = (items) => {
@@ -57,19 +57,16 @@ const promoServices = getActivePromoItems(services)
 
 This is the easy kind of duplication.  Both blocks are doing the absolute same thing. If the promo logic changes, both should probably change together. DRY makes sense *here*.
 
-**DRY**, or **Don’t Repeat Yourself**, is one of those concepts drilled into you early when learning software engineering.  It makes sense because repeated code means more code to maintain. If there’s a bug, you might have to fix it in multiple places. If logic changes, you have to remember every place that copied it. If two blocks are supposed to stay the same but slowly drift apart, that drift becomes a bug.
+**DRY**, or **Don’t Repeat Yourself**, is one of those concepts drilled into you early when learning software engineering.  It makes sense because repeated code means more code to maintain. If there’s a bug, you might have to fix it in multiple places. If logic changes, you have to remember every place that copied it. If two blocks are supposed to stay the same but slowly drift apart, that drift becomes a new bug.
 
 
 ## The hidden cost of abstraction
 
-So the instinct to remove duplication is not wrong.  But removing duplication is not free.  Most of the time, to remove duplication, we create an abstraction. A helper, a hook, a shared component, a factory, whatever.  And once multiple parts of the code use the same abstraction, they are now connected.
+So the instinct to remove duplication is not wrong.  But removing duplication is not free.  Most of the time, to remove duplication, we create an abstraction. A helper, a hook, a shared component, or a factory.  And once multiple parts of the code use that same abstraction, they are now connected.
 
-That connection is called *coupling*.  Coupling is basically how much one part of the code depends on another. Some coupling is normal. A codebase with zero coupling is just unrelated files. But the more tightly coupled things are, the more likely it is that a change in one place affects another place.
+That connection is called *coupling*.  **Coupling** is basically how much one part of the code depends on another. Some coupling is normal and a codebase with zero coupling is just unrelated files.  But the more tightly coupled things are, the more likely it is that a change in one place affects another place.
 
-
-## Why coupling feels worse
-
-That's the exact reason why I overthink removing duplication.  Duplication is easy to see, you open the file, see the repeated code, and think “this looks messy.”  Coupling, on the other hand, is harder to see.  It's sneaky, it hides behind clean looking abstractions.  The code can look cleaner because there are fewer repeated lines. But now one function or component might be responsible for multiple flows that only look similar on the surface.
+That's the exact reason why I overthink removing duplication.  Duplication is easier to see, you open the file, see the repeated code, and think “this looks messy.”  Coupling, on the other hand, is harder to see, it's sneaky, it hides behind clean looking abstractions.  The code can look cleaner because there are fewer repeated lines. But now one function or component might be responsible for multiple flows that only look similar on the surface.
 
 As much as possible, we want changes to move through code in a narrow path.
 
@@ -97,10 +94,9 @@ A real example I ran into was a component that already existed in our codebase. 
 So the question was:
 
 > ***1. Do I thread the new API into the existing component?***
-
 > ***2. Or do I create a separate component for the new flow?***
 
-The first option is more DRY.  One component, shared rendering, less duplicated code.  Something like this:
+The first option is more DRY since it's just still one component, shared rendering, less duplicated code.  Something like this:
 
 ```tsx
 function OrderSummary({ source }) {
@@ -128,7 +124,7 @@ function OrderSummary({ source }) {
 
 > *Note that the component was much larger than this*
 
-This removes duplication because both flows use the same component but the catch is that now the component has to understand both APIs.  It needs to know the legacy shape and it needs to know the new shape. It needs to know which helper to call. It needs to know which fields exist depending on the source.  Which seems fine at first until, one more difference appears.  Then another. Then another....
+This removes duplication because both flows use the same component but the catch is that now the component has to understand both APIs.  It needs to know the legacy shape and it needs to know the new shape. It needs to know which helper to call and which fields exist depending on the source.  Which seems fine at first until, one more difference appears.  Then another. Then another....
 
 And now the component starts looking like this:
 
@@ -178,26 +174,23 @@ function NewOrderSummary() {
 
 This definitely duplicates a fair amount of code.  The layout and markup is very similar and rendering logic repeat.  But now each component follows the shape of its own API.  If the new API changes, its easy to know where to look.
 
-That’s the tradeoff I keep overthinking.  Option A gives less code, but more coupling.  Option B gives more code, but more isolation.  In this case, I chose the second option.
+That’s the tradeoff I keep overthinking.  Option 1 gives less code, but more coupling.  Option 2 gives more code, but more isolation.  In this case, I chose the second option.
 
-The main reason was that the two flows only looked similar today. Based on the business context, I expected them to diverge later.  If I put both API sources into one component, I probably wasn’t avoiding complexity but was just delaying it until the component had more conditionals, more branching, and more reasons to change.
+The main reason was that the two flows only looked similar today but based on the business context, I expected them to diverge later.  If I put both API sources into one component, I probably wasn’t avoiding complexity but was just delaying it until the component had more conditionals, more branching, and more reasons to change.
 
-The existing component was also already large.  I would rather read two separate fairly large components than one massive component threaded with conditionals for multiple data sources.
+Plus, the existing component was also already large.  I would rather read two separate fairly large components than one massive component threaded with conditionals for multiple data sources.
 
 But that doesn’t mean duplicating the component is always right.  If both APIs represented the same concept, changed for the same reasons, and were likely to stay aligned, then sharing the component might be better.
 
 
 ## Same today, different tomorrow
 
-Similar code does not always mean shared knowledge, sometimes two things just happen to look the same right now.  That is why I think DRY is often taught too simply. The problem is not always duplicated syntax. If two parts of the code represent the same business rule, duplicating that rule is dangerous. When the rule changes, every copy has to change with it. That is the kind of duplication DRY is good at catching.  But if two parts of the code only look alike on the surface, abstracting them too early can be worse.
+Similar code does not always mean shared knowledge, sometimes two things just happen to look the same right now.  That is why I think DRY is often taught too simply. The problem is not always duplicated syntax. If two parts of the code represent the same business rule, duplicating that rule is dangerous.  When the rule changes, every copy has to change with it. That is the kind of duplication DRY is good at catching.  But if two parts of the code only look alike on the surface, abstracting them too early can be worse.
 
-Now before I abstract duplicated code, I ask:
+So now before I abstract duplicated code, I ask:
 
 - Are these two things the same concept?
 - Will they change for the same reasons?
 - Will future me understand why this abstraction exists?
-- Am I removing duplicated knowledge, or just hiding repeated syntax?
 
-If the answer is unclear, I usually leave the duplication alone a little longer.
-
-Duplication is not always the enemy.  Sometimes duplication is the price you pay to keep two things independent.  And sometimes the cleaner looking abstraction is only cleaner because the coupling is hidden.
+If the answer is unclear, I usually leave the duplication alone a little longer because duplication is not always the enemy.  Sometimes duplication is the price you pay to keep two things independent.  And sometimes the cleaner looking abstraction is only cleaner because the coupling is hidden.  And once that hidden coupling starts shaping future changes, premature abstraction becomes the root of all your future headaches.
