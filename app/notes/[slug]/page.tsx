@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { getNote, getNoteSlugs } from "@/lib/notes";
 import ArticleNav from "./ArticleNav";
+import type { Metadata } from "next";
 
 function slugify(value: string) {
   return value
@@ -41,14 +42,41 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
 
   try {
     const note = await getNote(slug);
+
+    const title = `${note.title} - Genna Cervantes`;
+    const description = note.description;
+    const image = "/og/default.png";
+    const url = `https://yourdomain.com/notes/${slug}`;
+
     return {
-      title: `${note.title} - Genna Cervantes`,
-      description: note.description,
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        url,
+        siteName: "Genna Cervantes",
+        images: [
+          {
+            url: image,
+            width: 1200,
+            height: 630,
+            alt: note.title,
+          },
+        ],
+        type: "article",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [image],
+      },
     };
   } catch {
     return {};
