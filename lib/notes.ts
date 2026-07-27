@@ -102,5 +102,14 @@ export async function getNotes(): Promise<NoteMeta[]> {
       description,
       readTime
     }))
-    .sort((a, b) => b.date.localeCompare(a.date));
+    .sort((a, b) => {
+      const publishedAtA = Date.parse(a.date);
+      const publishedAtB = Date.parse(b.date);
+
+      if (Number.isNaN(publishedAtA) && Number.isNaN(publishedAtB)) return 0;
+      if (Number.isNaN(publishedAtA)) return 1;
+      if (Number.isNaN(publishedAtB)) return -1;
+
+      return publishedAtB - publishedAtA;
+    });
 }
