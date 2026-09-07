@@ -113,6 +113,16 @@ export default async function NotePage({
             rehypePlugins={[rehypeHighlight]}
             remarkPlugins={[remarkGfm]}
             components={{
+              img: ({ src, alt }) => (
+                <img
+                  src={src}
+                  alt={alt ?? ''}
+                  style={{
+                    maxWidth: '100%',
+                    height: 'auto',
+                  }}
+                />
+              ),
               h1: ({ children }) => <h1>{children}</h1>,
               h2: ({ children }) => {
                 const id = slugify(textFromChildren(children));
@@ -127,10 +137,12 @@ export default async function NotePage({
             {note.content}
           </ReactMarkdown>
         </article>
-        <a href={`#top`} style={{fontSize: 13,
-                    color: "#7f4054",
-                    fontWeight: 600,
-                    textDecoration: 'none'}}>Back to top ↑</a>
+        <a href={`#top`} style={{
+          fontSize: 13,
+          color: "#7f4054",
+          fontWeight: 600,
+          textDecoration: 'none'
+        }}>Back to top ↑</a>
       </main>
     </div>
   );
